@@ -1,5 +1,7 @@
 # Parfocal
 
+Play it at **https://parfocal.vercel.app**
+
 A daily microscope game. Find the specimen at low power, swing in the next objective, add oil for the last one, and lock focus as close to the right plane as you can. Scoring is measured against each objective's real depth of field.
 
 ## Modes
@@ -25,7 +27,7 @@ Each mode has a shared daily slide plus random practice slides, timed or timeles
 
 ## Running it
 
-It is a single static page with no build step. Open `index.html` in a browser, or deploy the folder to any static host (for example Vercel).
+It is a single static page with no build step. Open `index.html` in a browser, or deploy the folder to any static host. The live site deploys from `main` on Vercel.
 
 ## Photographic plates (optional)
 
