@@ -12,6 +12,12 @@ A daily microscope game. Find the specimen at low power, swing in the next objec
 
 Each mode has a shared daily slide plus random practice slides, timed or timeless play, and a guided tutorial round.
 
+## Controls
+
+- Title menu: ↑ ↓ to choose, Enter to open, Q / E to switch microscope, T for timed or timeless, M for sound.
+- In a round: ↑ ↓ fine focus, Shift + ↑ ↓ coarse, Enter to lock, O for oil, Esc to pause. The knob's outer ring is coarse and its centre is fine; spinning fast travels further.
+- On a phone the knob becomes two drag strips (Coarse and Fine).
+
 ## Optics
 
 | Mode | Objectives |
@@ -23,7 +29,8 @@ Each mode has a shared daily slide plus random practice slides, timed or timeles
 - Depth of field (widefield): λn / NA²
 - Optical section (confocal, 1 AU): 0.88 λ / (n − √(n² − NA²))
 - Defocus blur: blur-disc diameter 2·Δz·tan θ, with sin θ = NA / n
-- Coarse focus moves 20 µm per tick, fine focus 0.25 µm.
+- Coarse focus moves 20 µm per tick (up to 5× when you spin fast), fine focus 0.25 µm.
+- Immersion oil sits on the coverslip as a bead about 0.8 mm tall. The front lens wets once the gap is under that, and the column breaks if you lift past 1.6 mm. The loupe zooms out in 3× steps so the lens and bead stay in view.
 
 ## Running it
 
