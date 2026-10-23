@@ -35,6 +35,10 @@ Each mode has a shared daily slide plus random practice slides, timed or timeles
 - The knobs have no steps. Coarse moves 0.8 µm per degree turned slowly and gears up to 6× when you spin fast; fine moves 0.07 µm per degree, up to 4×. A viscous drive (time constant 60–85 ms) delivers each turn to the stage frame by frame, so the image slides continuously through focus.
 - Immersion oil sits on the coverslip as a bead about 0.8 mm tall. The front lens wets once the gap is under that, and the column breaks if you lift past 1.6 mm. The loupe zooms out in 3× steps so the lens and bead stay in view.
 
+## Scoring
+
+Focus is graded by what you can see, not by raw distance from a target. Each plane of the target is scored by the extra blur it shows on screen (on the confocal, by how much it dims): under 0.7 px of added blur is invisible and costs nothing, and credit halves by 2.2 px. Planes are weighted by how much specimen sits in them, and the total is compared with the sharpest plane that field allows, so a thick patch of smear isn't held to a standard no plane could meet. The verdict draws that sharpness curve with where you locked. Time bonus and technique penalties (coarse above 10x, no oil, wrong cube, bleaching) apply on top.
+
 ## Running it
 
 It is a single static page with no build step. Open `index.html` in a browser, or deploy the folder to any static host. The live site deploys from `main` on Vercel.

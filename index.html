@@ -387,6 +387,18 @@ body[data-screen="title"] .brand { pointer-events: none; }
 .v-break .neg { color: var(--warn); }
 .v-notes { margin: 8px 0 0; padding-left: 18px; font-size: 14.5px; color: var(--ink-2); max-width: 36em; }
 .v-notes li { margin-bottom: 6px; }
+.v-curve { margin: 12px 0 0; max-width: 360px; }
+.v-curve svg { display: block; width: 100%; height: auto; overflow: visible; }
+.vc-head { margin: 0 0 6px; font: 600 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.vc-head span { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 500; }
+.vc-band { fill: color-mix(in srgb, var(--acc) 10%, transparent); }
+.vc-axis { stroke: var(--line-strong); stroke-width: 1; }
+.vc-fill { fill: color-mix(in srgb, var(--acc) 16%, transparent); }
+.vc-line { fill: none; stroke: var(--acc); stroke-width: 2; stroke-linejoin: round; }
+.vc-you-line { stroke: var(--ink); stroke-width: 1.2; stroke-dasharray: 3 3; opacity: .55; }
+.vc-dot { fill: var(--ink); stroke: var(--bg); stroke-width: 2; }
+.vc-you { font: 600 10px var(--f-mono); fill: var(--ink); letter-spacing: .06em; text-transform: uppercase; }
+.vc-cap { font: 500 9px var(--f-mono); fill: var(--muted); }
 .v-next { align-self: flex-start; margin-top: 12px; min-width: 230px; }
 .g-verdict.v-in > * { animation: vIn .55s var(--e-snap) both; }
 .g-verdict.v-in > :nth-child(2) { animation-delay: .05s; } .g-verdict.v-in > :nth-child(3) { animation-delay: .1s; }
@@ -942,6 +954,7 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
           <div class="v-score"><b id="vScore">0</b><span>/ 1000</span></div>
           <dl class="v-break" id="vBreak"></dl>
           <ul class="v-notes" id="vNotes"></ul>
+          <div class="v-curve" id="vCurve" hidden></div>
           <button class="btn primary shine v-next" id="nextBtn">Swing in 40x <kbd>⏎</kbd></button>
         </section>
       </div>
@@ -1011,10 +1024,17 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
       <section class="notes-block">
         <h3>House rules of the bench</h3>
         <div class="rules">
-          <div class="rule"><b>01</b><h4>Coarse first, at 10x only</h4><p>At 100x one coarse tick is about 40 times the depth of field, and a fast spin drives the lens into the slide.</p></div>
+          <div class="rule"><b>01</b><h4>Coarse first, at 10x only</h4><p>At 100x even a slow 10° nudge of coarse moves about 15 times the depth of field, and a fast spin drives the lens into the slide.</p></div>
           <div class="rule"><b>02</b><h4>Parfocal lenses</h4><p>Focus carries over when you swing objectives, so 40x and 100x need only a small turn of fine focus.</p></div>
           <div class="rule"><b>03</b><h4>Oil at 100x</h4><p>The front lens has to sit in the oil. Without it the usable NA drops to about 0.95 and the image stays dim and soft.</p></div>
           <div class="rule"><b>04</b><h4>Watch for dust</h4><p>The top of the coverslip sits 170 µm above the smear. Specks up there come into focus first.</p></div>
+        </div>
+      </section>
+      <section class="notes-block">
+        <h3>How focus is scored</h3>
+        <div class="rules">
+          <div class="rule"><b>A</b><h4>Graded by eye</h4><p>Depth of field is the range where the image already looks sharp. So you're scored on the blur you can actually see on screen: a few microns off at 10x is invisible and costs nothing, while a quarter-micron at 100x shows and counts.</p></div>
+          <div class="rule"><b>B</b><h4>Real slides have depth</h4><p>A smear isn't flat: cells sit at slightly different heights, and thick patches can't all be sharp at once. Each field is measured against the sharpest plane it allows, and the verdict draws that curve with where you locked.</p></div>
         </div>
       </section>
       <section class="notes-block">
@@ -1216,6 +1236,14 @@ function effective(mode, k, oil, pinhole) {
   let dof = mode === "confocal" ? confocalSection(m.lam, n, NA) : m.lam * n / (NA * NA);
   if (mode === "confocal" && pinhole === 2) { dof *= 1.6; bright *= 1.6; }
   return { NA, n, dof, extra, bright, lam: m.lam };
+}
+/* Confocal slices are stored 0.6 µm apart; averaging each slice's visibility across its own
+   thickness keeps the brightness smooth as you focus between them. */
+const SLICE_UM = 0.6;
+function sectionVis(dz, sec) {
+  let a = 0;
+  for (let i = 0; i < 5; i++) { const u = dz + (i / 4 - 0.5) * SLICE_UM; a += Math.exp(-4 * Math.LN2 * (u / sec) ** 2); }
+  return a / 5;
 }
 function sigmaPx(o, e, dz) {
   const th = Math.asin(Math.min(0.999, e.NA / e.n));
@@ -1714,7 +1742,7 @@ function buildLayers(sp, o, usePlate) {
   if (sp.kind === "confocal") return buildConfocalLayers(sp, o);
   const s = o.s, viewR = SIZE / 2 / s + 6;
   const inView = (x, y, pad = 0) => (x * x + y * y) < (viewR + pad) * (viewR + pad);
-  const layers = [-0.5, 0, 0.5].map(z => ({ z, canvas: newCanvas() }));
+  const layers = [-0.5, 0, 0.5].map(z => ({ z, canvas: newCanvas(), n: 0 })); // n: how much specimen each plane holds, for grading
   const base = layers[1];
   const bctx = prepCtx(base.canvas, s);
   for (const b of sp.blobs) {
@@ -1725,6 +1753,7 @@ function buildLayers(sp, o, usePlate) {
   for (const c of sp.clumps) {
     if (!inView(c.x, c.y, c.r)) continue;
     bctx.beginPath(); bctx.arc(c.x, c.y, c.r, 0, Math.PI * 2); bctx.fillStyle = rgba(sp.stain.rim, c.a * 0.75); bctx.fill();
+    base.n += 0.3;
   }
   for (const d of sp.debris) if (inView(d.x, d.y, 12)) drawDebris(bctx, d);
   if (usePlate && plateImgs[sp.orgId]) {
@@ -1733,14 +1762,16 @@ function buildLayers(sp, o, usePlate) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     const sc = Math.max(SIZE / img.width, SIZE / img.height);
     ctx.drawImage(img, (SIZE - img.width * sc) / 2, (SIZE - img.height * sc) / 2, img.width * sc, img.height * sc);
+    base.n += 1000; // a photograph is one plane
   } else {
     const ctxs = layers.map(L => (L === base ? bctx : prepCtx(L.canvas, s)));
     for (const c of sp.cells) {
       if (!inView(c.x, c.y, 5)) continue;
-      drawCell(ctxs[c.z < -0.25 ? 0 : c.z > 0.25 ? 2 : 1], c, sp, s);
+      const li = c.z < -0.25 ? 0 : c.z > 0.25 ? 2 : 1;
+      drawCell(ctxs[li], c, sp, s); layers[li].n += 1;
     }
   }
-  const dust = { z: DUST_Z, canvas: newCanvas() };
+  const dust = { z: DUST_Z, canvas: newCanvas(), dust: true, n: 0 };
   const dctx = prepCtx(dust.canvas, s);
   for (const d of sp.dust) if (inView(d.x, d.y, 70)) drawDust(dctx, d);
   layers.push(dust);
@@ -1797,9 +1828,10 @@ function buildConfocalLayers(sp, o) {
   const inView = (x, y) => x * x + y * y < viewR * viewR;
   const layers = [];
   const bucket = (ch, z) => {
-    const zq = Math.round(z / 0.6) * 0.6;
+    const zq = Math.round(z / SLICE_UM) * SLICE_UM;
     let L = layers.find(l => l.ch === ch && Math.abs(l.z - zq) < 1e-6);
-    if (!L) { L = { ch, z: zq, w: 1, canvas: newCanvas() }; L.ctx = prepCtx(L.canvas, s); layers.push(L); }
+    if (!L) { L = { ch, z: zq, w: 1, n: 0, canvas: newCanvas() }; L.ctx = prepCtx(L.canvas, s); layers.push(L); }
+    L.n++;
     return L.ctx;
   };
   const col = (ch, a) => rgba(CH[ch].rgb, a);
@@ -1886,7 +1918,7 @@ function renderField(ctx, sp, layers, v) {
     const diff = 0.26 * e.lam / e.NA * o.s;
     for (const L of layers) {
       const dz = d + L.z;
-      const w = Math.exp(-4 * Math.LN2 * (dz / e.dof) ** 2) * Math.min(1.25, e.bright);
+      const w = sectionVis(dz, e.dof) * Math.min(1.25, e.bright);
       if (w < 0.02) continue;
       const lateral = Math.min(6, Math.sqrt(diff * diff + (0.12 * sigmaPx(o, e, dz)) ** 2) + e.extra * 0.5);
       drawBlurred(ctx, L.canvas, lateral, w);
@@ -3100,7 +3132,7 @@ function updateLoupe(gmm) {
 const TUT = (() => {
   const fineCtl = () => isPhone() ? "#jogFine" : "#knob";
   const coarseCtl = () => isPhone() ? "#jogCoarse" : "#knob";
-  const acc = () => { const e = eff(); return Math.exp(-Math.LN2 * (2 * err() / e.dof) ** 2); };
+  const acc = () => focusAccuracy();
   const steps = [
     { stage: 0, pre: true, target: () => "#eyepieceBox", next: true, text: () => "This is the <b>eyepiece</b> at 10x. It's a blur because the lens is still far above the slide." },
     { stage: 0, pre: true, target: () => "#loupe", next: true, text: () => "The <b>loupe</b> magnifies the gap between the lens and the coverslip. Watch it as you focus." },
@@ -3109,13 +3141,13 @@ const TUT = (() => {
     { stage: 0, pre: true, target: () => "#eyepieceBox", done: () => d() > -45, text: () => "Specks snapping into focus? That's <b>dust on top of the coverslip</b>, 170 µm above the smear. Keep going down." },
     { stage: 0, pre: true, target: fineCtl, done: () => acc() > 0.7,
       text: () => isPhone() ? "Nearly there. Drag the <b>Fine</b> strip slowly and sharpen the purple smear." : "Nearly there. Use the <b>centre</b> of the knob, or ↑ and ↓, for fine focus. Turned slowly it moves a fraction of a micron. Sharpen the purple smear." },
-    { stage: 0, pre: true, target: () => "#lockBtn", done: () => G.locked, text: () => "Sharp. Press <b>Lock focus</b>. Your score is how close you are against the 8.8 µm depth of field at 10x." },
+    { stage: 0, pre: true, target: () => "#lockBtn", done: () => G.locked, text: () => "Sharp. Press <b>Lock focus</b>. You're graded on how sharp the smear looks next to the sharpest plane it has, so if it looks sharp, it is." },
     { stage: 0, post: true, target: () => "#nextBtn", text: () => "That's your verdict. Now swing in the <b>40x</b> objective." },
     { stage: 1, pre: true, target: fineCtl, done: () => acc() > 0.75, text: () => "Objectives are <b>parfocal</b>, so the focus carried over. Use only fine focus here. Coarse at 40x costs points." },
     { stage: 1, pre: true, target: () => "#lockBtn", done: () => G.locked, text: () => "Lock it in." },
     { stage: 1, post: true, target: () => "#nextBtn", text: () => "Last one: swing in <b>100x</b>." },
     { stage: 2, pre: true, target: () => "#oilBtn", done: () => immersed(), text: () => "100x needs <b>immersion oil</b>. Add a drop and watch the loupe: the front lens has to sit in the oil." },
-    { stage: 2, pre: true, target: fineCtl, done: () => acc() > 0.75, text: () => "Now fine focus. The depth of field is 0.53 µm, so every tick counts. Never touch coarse at 100x." },
+    { stage: 2, pre: true, target: fineCtl, done: () => acc() > 0.75, text: () => "Now fine focus. The depth of field is 0.53 µm, so small turns matter here. Never touch coarse at 100x." },
     { stage: 2, pre: true, target: () => "#lockBtn", done: () => G.locked, text: () => "Lock focus and see how you did." },
     { stage: 2, post: true, target: () => "#nextBtn", text: () => "Tutorial round done. See your results." },
   ];
@@ -3297,6 +3329,7 @@ async function toVerdict(v) {
   $("vBreak").innerHTML = (v.breakdown || []).map(([a, b, neg]) => `<div><dt>${a}</dt><dd class="${neg ? "neg" : ""}">${b}</dd></div>`).join("");
   const ul = $("vNotes"); ul.innerHTML = "";
   v.notes.forEach(n => { const li = document.createElement("li"); li.textContent = n; ul.appendChild(li); });
+  $("vCurve").innerHTML = v.curve || ""; $("vCurve").hidden = !v.curve;
   $("nextBtn").innerHTML = (v.final ? "See results" : v.crash ? `New slide, swing in ${OBJ[G.k + 1].mag}x` : `Swing in ${OBJ[G.k + 1].mag}x`) + " <kbd>⏎</kbd>";
   $("vScore").parentElement.classList.toggle("win", v.score >= WIN);
   await wait(v.crash ? 700 : 160);
@@ -3364,13 +3397,70 @@ function crash(how) {
   G.dirty = true;
   toVerdict({ title: `${o.mag}x · slide cracked`, tier: CRASH.tier, quip: G.quipRng.pick(CRASH.quips), score: 0, notes, final: G.stage === 2, crash: true, breakdown: [["Accuracy", "—"], ["Crash", "0", true]] });
 }
+/* ---------- Grading: score what the eye can see ----------
+   Depth of field is the range over which the image looks sharp, so grading straight against it
+   punishes differences nobody can see (3 µm off at 10x adds a third of a pixel of blur). Instead each
+   plane of the target is graded by the extra blur it shows on screen, or, on the confocal, by how
+   much it dims, weighted by how much specimen sits in that plane. A smear isn't flat: where it is
+   thicker than the depth of field, no single plane gets every cell sharp, so the score is measured
+   against the sharpest plane this particular field allows. */
+const BLUR_OK = 0.7, BLUR_HALF = 1.5; // extra blur in screen px: invisible below 0.7, half credit at 2.2
+function gradedLayers() {
+  const t = tgt();
+  return G.layers.filter(L => !L.dust && (G.mode === "bright" || L.ch === t.ch))
+    .map(L => ({ z: L.z, wt: G.mode === "fluor" ? L.w : (L.n || 0) })).filter(L => L.wt > 0);
+}
+function planeSharpness(o, e, dz) {
+  if (G.mode === "confocal") { const I = sectionVis(dz, e.dof) / sectionVis(0, e.dof); return I >= 0.85 ? 1 : Math.pow(I / 0.85, 1.3); }
+  const s0 = sigmaPx(o, e, 0), s1 = sigmaPx(o, e, dz), B = Math.sqrt(Math.max(0, s1 * s1 - s0 * s0));
+  return B <= BLUR_OK ? 1 : Math.exp(-Math.LN2 * ((B - BLUR_OK) / BLUR_HALF) ** 2);
+}
+function sharpnessAt(dd, Ls, o, e) { let a = 0, w = 0; for (const L of Ls) { a += L.wt * planeSharpness(o, e, dd + L.z); w += L.wt; } return w ? a / w : 0; }
+function bestPlane() {
+  const o = OBJ[G.k], e = eff(), key = `${G.stage}|${G.k}|${e.NA}|${e.dof}|${G.layers.length}`;
+  if (G.best && G.best.key === key) return G.best;
+  const Ls = gradedLayers(), c = -tgt().z, span = Math.max(4 * e.dof, 3), N = 480;
+  const xs = [], qs = [];
+  for (let i = 0; i <= N; i++) { const dd = c - span + 2 * span * i / N; xs.push(dd); qs.push(sharpnessAt(dd, Ls, o, e)); }
+  const q = Math.max(...qs);
+  // the middle of the best plateau is the plane to aim for
+  let lo = Infinity, hi = -Infinity;
+  qs.forEach((v, i) => { if (v >= q * 0.995) { lo = Math.min(lo, xs[i]); hi = Math.max(hi, xs[i]); } });
+  G.best = { key, d: (lo + hi) / 2, q, Ls, o, e };
+  return G.best;
+}
+function focusAccuracy(dd = d()) { const b = bestPlane(); return b.q > 0 ? clamp(sharpnessAt(dd, b.Ls, b.o, b.e) / b.q, 0, 1) : 0; }
+const fmtUm = (v) => `${v < 10 ? v.toFixed(2) : v.toFixed(0)} µm`;
+function focusCurve(you) {
+  const b = bestPlane(), e = b.e;
+  // span: out to where sharpness has faded, and far enough to show where you locked
+  let R = e.dof;
+  for (let r = e.dof / 8; r < 60 * e.dof; r *= 1.15) { if (sharpnessAt(b.d + r, b.Ls, b.o, e) / b.q < 0.03 && sharpnessAt(b.d - r, b.Ls, b.o, e) / b.q < 0.03) { R = r; break; } R = r; }
+  R = Math.max(R * 1.1, Math.abs(you - b.d) * 1.2, e.dof * 0.8);
+  const W = 300, H = 74, top = 10, base = 58, X = (dd) => ((dd - (b.d - R)) / (2 * R)) * W, Y = (q) => base - (q / b.q) * (base - top);
+  const pts = []; for (let i = 0; i <= 120; i++) { const dd = b.d - R + 2 * R * i / 120; pts.push(`${X(dd).toFixed(1)},${Y(sharpnessAt(dd, b.Ls, b.o, e)).toFixed(1)}`); }
+  const yq = sharpnessAt(you, b.Ls, b.o, e), xy = clamp(X(you), 2, W - 2), band = [X(b.d - e.dof / 2), X(b.d + e.dof / 2)];
+  const word = G.mode === "confocal" ? "optical section" : "depth of field";
+  return `<p class="vc-head">Sharpness by lens height <span>· band = ${word}</span></p><svg viewBox="0 0 ${W} ${H + 12}" role="img" aria-label="How sharp the target looks at each lens height, with where you locked">
+    <rect x="${band[0].toFixed(1)}" y="${top - 4}" width="${(band[1] - band[0]).toFixed(1)}" height="${base - top + 4}" class="vc-band"/>
+    <line x1="0" y1="${base}" x2="${W}" y2="${base}" class="vc-axis"/>
+    <polygon points="0,${base} ${pts.join(" ")} ${W},${base}" class="vc-fill"/>
+    <polyline points="${pts.join(" ")}" class="vc-line"/>
+    <line x1="${xy.toFixed(1)}" y1="${top - 6}" x2="${xy.toFixed(1)}" y2="${base}" class="vc-you-line"/>
+    <circle cx="${xy.toFixed(1)}" cy="${Y(yq).toFixed(1)}" r="4.5" class="vc-dot"/>
+    <text x="${clamp(xy, 16, W - 16).toFixed(1)}" y="${top - 1}" text-anchor="middle" class="vc-you">you</text>
+    <text x="0" y="${H + 6}" class="vc-cap">← lens up</text>
+    <text x="${W}" y="${H + 6}" text-anchor="end" class="vc-cap">lens down →</text>
+  </svg>`;
+}
+
 function lock(timeout) {
   if (!G || G.locked || !G.ready || G.paused || G.busyAnim) return;
   G.locked = true; haltFocus(); if (MUSIC) MUSIC.setScene("game");
   const o = OBJ[G.k], e = eff(), t = tgt();
-  const er = err();
-  const acc = Math.exp(-Math.LN2 * (2 * er / e.dof) ** 2);
-  const bd = [["Accuracy", `${Math.round(acc * 100)}%`]];
+  const best = bestPlane(), er = d() - best.d;
+  const acc = focusAccuracy();
+  const bd = [["Sharpness", `${Math.round(acc * 100)}%`]];
   let score;
   if (G.timed) {
     const rem = Math.max(0, o.time - (performance.now() - G.t0) / 1000) / o.time;
@@ -3379,7 +3469,14 @@ function lock(timeout) {
   } else score = 1000 * acc;
   const notes = [];
   const ae = Math.abs(er);
-  notes.push(`${ae < 0.005 ? "Dead on the focal plane" : `Off by ${ae < 10 ? ae.toFixed(2) : ae.toFixed(0)} µm, ${er > 0 ? "lens too close" : "lens too far"}`}. ${G.mode === "confocal" ? "Optical section" : "Depth of field"} at ${o.mag}x${G.k === 2 && !immersed() ? " without oil" : ""} is ${e.dof.toFixed(2)} µm.`);
+  const dofWord = G.mode === "confocal" ? "optical section" : "depth of field", conf = G.mode === "confocal";
+  if (acc >= 0.97) notes.push(ae < 0.01 ? "Right on the sharpest plane." : `${fmtUm(ae)} from the sharpest plane, ${ae <= e.dof / 2 ? `inside the ${fmtUm(e.dof)} ${dofWord}` : "close enough"}. To the eye it is as sharp as this field gets, so it scores in full.`);
+  else {
+    const look = conf ? (acc >= 0.75 ? "the layer has started to dim" : acc >= 0.4 ? "the layer is clearly dimmer" : acc >= 0.1 ? "the layer has mostly faded" : "the layer has gone dark")
+      : (acc >= 0.75 ? "edges are just starting to soften" : acc >= 0.4 ? "the target looks visibly soft" : acc >= 0.1 ? "the target is blurred" : "barely a shape is left");
+    notes.push(`Lens ${fmtUm(ae)} too ${er > 0 ? "close" : "far"} for the sharpest plane. At ${o.mag}x that shows: ${look}. The ${dofWord} here is ${fmtUm(e.dof)}${G.k === 2 && !immersed() ? " without oil" : ""}.`);
+  }
+  if (G.k > 0 && best.q < 0.9) notes.push(`This patch is thicker than the ${dofWord}, so no single plane gets all of it sharp. You're scored against the best plane it allows.`);
   if (G.coarseHigh[G.k]) { score -= 150; bd.push(["Coarse at " + o.mag + "x", "−150", true]); notes.push(`Coarse focus at ${o.mag}x. Even a slow 10° nudge of coarse moves ${Math.round(10 * KNOB.coarse.umPerDeg)} µm, about ${Math.round(10 * KNOB.coarse.umPerDeg / o.dof)}× the ${G.mode === "confocal" ? "section" : "depth of field"} here.`); }
   if (G.k === 2 && !immersed()) { score *= 0.5; bd.push(["No oil", "×0.5", true]); notes.push(G.oil ? "The oil was on the slide but the front lens wasn't in it. Air between lens and coverslip caps the NA near 0.95." : "No immersion oil. Air between lens and coverslip caps the NA near 0.95, so the image stayed dim and soft."); }
   if (G.k === 1 && G.oilOn40) { score -= 100; bd.push(["Oil on 40x", "−100", true]); notes.push("The dry 40x lens dipped into the oil. It smears the front element; add oil only for 100x."); }
@@ -3400,11 +3497,12 @@ function lock(timeout) {
   if (acc > 0.8 && G.k === 1 && !G.coarseHigh[1] && !G.fresh) notes.push("Parfocal lenses: the 10x focus carried over, so a small turn of fine was enough.");
   score = Math.max(0, Math.round(score));
   G.results[G.stage] = { mag: o.mag, score, acc, err: er };
+  const curve = focusCurve(d());
   G.lessons.push(...notes.slice(1).filter(n => !n.startsWith("Parfocal")));
   const T = tierFor(score / 1000, TIERS);
   G.dirty = true;
   sfx("confirm");
-  toVerdict({ title: `${o.mag}x · locked`, tier: T.tier, quip: onDust ? DUST_QUIP : G.quipRng.pick(T.quips), score, notes, final: G.stage === 2, breakdown: bd });
+  toVerdict({ title: `${o.mag}x · locked`, tier: T.tier, quip: onDust ? DUST_QUIP : G.quipRng.pick(T.quips), score, notes, final: G.stage === 2, breakdown: bd, curve });
 }
 $("lockBtn").addEventListener("click", () => lock(false));
 $("nextBtn").addEventListener("click", () => {
@@ -3842,7 +3940,8 @@ requestAnimationFrame(loop);
 if (location.hash === "#pftest") window.__pf = { get G() { return G; }, get music() { return { playing: MUSIC.playing, enabled: MUSIC.enabled }; }, plates() { return Object.keys(plateImgs); },
   renderSpec(mode, seed, k) { const m = MODES[mode], sp = genSpecimen(seed, mode, mode === "bright" ? ORGS[seed % ORGS.length].id : null), o = m.objs[k], cv = newCanvas(); renderField(cv.getContext("2d"), sp, buildLayers(sp, o, k === 2), { o, e: effective(mode, k, true, 1), d: -sp.targets[k].z, cube: "all", shutter: true, signal: 1 }); return { url: cv.toDataURL("image/jpeg", 0.85), kind: sp.plate || sp.orgId || sp.kind }; },
   start(mode, seed) { startGame({ seed, mode }); },
-  drive, log: [], setLeft(sec) { const o = OBJ[G.k]; G.t0 = performance.now() - (o.time - sec) * 1000; },
+  drive, log: [], grade(off) { const b = bestPlane(), e = eff(); return { acc: focusAccuracy(b.d + off), old: Math.exp(-Math.LN2 * (2 * (b.d + off + tgt().z) / e.dof) ** 2), best: b.d, q: b.q, dof: e.dof }; },
+  goStage(k) { G.k = k; G.stage = k; OBJ = MODES[G.mode].objs; G.layers = buildLayers(G.sp, OBJ[k], k === 2); G.oil = k === 2; G.contact = k === 2; G.stageZ = G.p[k] - G.sp.targets[k].z; G.zv = G.stageZ; G.best = null; }, setLeft(sec) { const o = OBJ[G.k]; G.t0 = performance.now() - (o.time - sec) * 1000; },
   async knobTest() {
     // coarse ramps 0 -> 600 deg/s -> 0 over 3 s, then fine ramps 0 -> 300 deg/s -> 0 over 3 s
     const OC = new OfflineAudioContext(1, 44100 * 6, 44100), S = knobAudio(OC);
