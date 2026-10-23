@@ -272,6 +272,44 @@ body[data-screen="title"] .brand { pointer-events: none; }
   background: var(--glass-strong); border: 1px solid var(--glass-edge); box-shadow: var(--shadow), var(--hi); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   font: 500 12px var(--f-mono); letter-spacing: .04em; color: var(--ink); }
 .cone { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; pointer-events: none; }
+
+/* Desktop title: fit the window's height as well as its width. Type and spacing shrink on short
+   screens (laptops at 125% scaling are about 1480 x 740), the left column centres vertically, and the
+   eyepiece is sized and centred against the window, not against the column. */
+@media (min-width: 981px) {
+  .title-screen { min-height: calc(100svh - 64px); }
+  .t-grid { align-items: stretch; }
+  .t-left { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-block: 8px 18px; }
+  .t-left > .wordmark { align-self: stretch; }
+  .wordmark { font-size: clamp(54px, min(8.2vw, 12vh), 124px); }
+  .tagline { margin-top: 10px; }
+  .modes { margin: clamp(12px, 2.6vh, 26px) 0 4px; }
+  .menu { margin: clamp(20px, 4.2vh, 52px) 0 6px; }
+  .m-name { font-size: clamp(24px, min(3.3vw, 4.4vh), 46px); }
+  .m-item { padding-block: clamp(4px, .8vh, 7px) clamp(5px, .9vh, 8px); }
+  .m-caption { margin-top: clamp(6px, 1.4vh, 14px); }
+  .t-chips { margin-top: clamp(10px, 2vh, 22px); }
+  .t-right { min-height: 0; }
+  .hero-ep { width: min(calc((100svh - 64px) * .8), 46vw, 680px); right: -4%; }
+}
+@media (min-width: 981px) and (max-height: 820px) { .t-keys { display: none; } .m-caption { font-size: 14px; } }
+/* Desktop game: the side view scales with the window height so the loupe never drops below the fold */
+@media (min-width: 981px) {
+  .g-scope .scope-art { height: clamp(180px, calc(100svh - 468px), 340px); width: auto; max-width: 100%; aspect-ratio: 3 / 4; margin-inline: auto; }
+}
+@media (min-width: 981px) and (max-height: 820px) {
+  .hud { padding-block: 6px 10px; }
+  .g-scope { gap: 8px; padding: 12px 14px; }
+  .loupe { padding-top: 8px; }
+  .game { gap: 18px; }
+  .game-screen { padding-bottom: 10px; }
+}
+@media (min-width: 981px) and (max-height: 700px) {
+  .g-dock .keys, .knob-cap { display: none; }
+  .knob { width: 172px; height: 172px; }
+  .g-dock { gap: 10px; padding: 12px 14px; }
+}
+@media (min-width: 981px) and (max-height: 640px) { .tagline { display: none; } }
 .cone-label { position: absolute; z-index: 3; margin: 0; font: 500 12px var(--f-mono); color: var(--acc); white-space: nowrap; transform: rotate(var(--tilt)); }
 
 /* ============ GAME ============ */
@@ -589,26 +627,22 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
 
 /* ============ TRANSITIONS ============ */
 .iris { position: fixed; inset: 0; z-index: 90; background: var(--scope); color: #efe6d8; display: grid; place-items: center; clip-path: circle(0px at 50% 50%); }
-.iris-text, .wipe-text { display: grid; justify-items: center; gap: 10px; text-align: center; padding: 0 24px; }
-.iris-text b, .wipe-text b { font: italic 900 clamp(34px, 6vw, 72px)/.9 var(--f-display); font-stretch: 122%; letter-spacing: -0.045em; text-transform: uppercase; }
+.iris-text { display: grid; justify-items: center; gap: 10px; text-align: center; padding: 0 24px; }
+.iris-text b { font: italic 900 clamp(34px, 6vw, 72px)/.9 var(--f-display); font-stretch: 122%; letter-spacing: -0.045em; text-transform: uppercase; }
 .iris-text b { color: var(--acc); }
-.iris-text span, .wipe-text span { font: 500 13px var(--f-mono); letter-spacing: .08em; min-height: 1.5em; opacity: .8; }
+.iris-text span { font: 500 13px var(--f-mono); letter-spacing: .08em; min-height: 1.5em; opacity: .8; }
 .iris-bar { display: block; width: min(260px, 60vw); height: 3px; border-radius: 2px; background: rgba(255, 240, 220, .14); overflow: hidden; }
 .iris-bar i { display: block; height: 100%; background: var(--acc); transform-origin: left; transform: scaleX(0); }
-.wipe { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; pointer-events: auto; overflow: hidden; }
-.wipe-band { position: absolute; top: -20%; bottom: -20%; left: -30%; right: -30%; transform: skewX(var(--skew)) translateX(-130%); }
-.wipe-band.w1 { background: var(--acc); }
-.wipe-band.w2 { background: var(--ink); }
-.wipe-text { position: relative; z-index: 1; color: var(--acc-ink); opacity: 0; }
-.wipe.in .w2 { animation: wipeIn .42s var(--e-slide) both; }
-.wipe.in .w1 { animation: wipeIn .42s var(--e-slide) .07s both; }
-.wipe.in .wipe-text { animation: showT .2s ease .3s forwards; }
-@keyframes showT { to { opacity: 1; } }
-.wipe.out .w1 { animation: wipeOut .44s var(--e-slide) both; transform: skewX(var(--skew)) translateX(0); }
-.wipe.out .w2 { animation: wipeOut .44s var(--e-slide) .07s both; transform: skewX(var(--skew)) translateX(0); }
-.wipe.out .wipe-text { opacity: 1; animation: fadeOut .15s ease forwards; }
-@keyframes wipeIn { to { transform: skewX(var(--skew)) translateX(0); } }
-@keyframes wipeOut { to { transform: skewX(var(--skew)) translateX(130%); } }
+/* Whip-pan: the old screen flies off with motion blur, speed lines streak across, the new one lands */
+.dash { position: fixed; inset: 0; z-index: 90; pointer-events: none; overflow: hidden; }
+.dash i { position: absolute; left: 0; height: var(--h); top: var(--y); width: var(--w); border-radius: var(--r, 99px); background: var(--c); opacity: 0; transform: translateX(-120%) skewX(var(--skew)); }
+.dash.go i { animation: dashLine var(--d) cubic-bezier(.55, 0, .25, 1) var(--t) both; }
+.dash.go.fwd i { animation-name: dashLineFwd; }
+@keyframes dashLine { 0% { opacity: 0; transform: translateX(-60vw) skewX(var(--skew)); } 15% { opacity: var(--o); } 85% { opacity: var(--o); } 100% { opacity: 0; transform: translateX(130vw) skewX(var(--skew)); } }
+@keyframes dashLineFwd { 0% { opacity: 0; transform: translateX(130vw) skewX(var(--skew)); } 15% { opacity: var(--o); } 85% { opacity: var(--o); } 100% { opacity: 0; transform: translateX(-60vw) skewX(var(--skew)); } }
+.dash .flash { position: absolute; inset: 0; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--acc) 24%, transparent) 40%, color-mix(in srgb, var(--acc) 24%, transparent) 60%, transparent); opacity: 0; }
+.dash.go .flash { animation: dashFlash .45s ease both; }
+@keyframes dashFlash { 30%, 55% { opacity: 1; } }
 
 #fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 95; }
 
@@ -1107,11 +1141,7 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
 <div class="iris" id="iris" hidden aria-hidden="true">
   <div class="iris-text"><b id="irisTitle">Preparing slide</b><span id="irisStep"></span><i class="iris-bar"><i id="irisBar"></i></i></div>
 </div>
-<div class="wipe" id="wipe" hidden aria-hidden="true">
-  <div class="wipe-band w2"></div>
-  <div class="wipe-band w1"></div>
-  <div class="wipe-text"><b id="wipeTitle">Scoring</b><span id="wipeStep"></span></div>
-</div>
+<div class="dash" id="dash" hidden aria-hidden="true"><div class="flash"></div></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <script>
 (() => {
@@ -2237,6 +2267,7 @@ function sfx(name, opt = {}) {
       case "confirm": tone(A, out, { f: 150, f2: 55, dur: 0.16, g: 0.32 }); burst(A, out, { dur: 0.04, f: 1300, q: 1.5, g: 0.22 }); tone(A, out, { f: 2350, t: 0.03, dur: 0.16, g: 0.05 }); tone(A, out, { f: 3520, t: 0.06, dur: 0.14, g: 0.03 }); break;
       case "back": tone(A, out, { f: 900, f2: 360, dur: 0.14, g: 0.07, type: "triangle" }); burst(A, out, { dur: 0.08, f: 2400, f2: 600, q: 1.2, g: 0.08 }); break;
       case "whoosh": burst(A, out, { dur: 0.42, f: 320, f2: 2800, q: 0.9, g: 0.16 }); break;
+      case "dash": burst(A, out, { dur: 0.32, f: 700, f2: 5200, q: 1.1, g: 0.2 }); burst(A, out, { t: 0.16, dur: 0.24, f: 4200, f2: 900, q: 0.9, g: 0.1 }); tone(A, out, { f: 520, f2: 1560, dur: 0.16, g: 0.035, type: "triangle" }); break;
       case "whooshOut": burst(A, out, { dur: 0.4, f: 2600, f2: 300, q: 0.9, g: 0.13 }); break;
       case "swap": burst(A, out, { dur: 0.26, f: 500, f2: 3200, q: 1, g: 0.12 }); tone(A, out, { f: 1320, t: 0.08, dur: 0.18, g: 0.05 }); tone(A, out, { f: 1980, t: 0.12, dur: 0.2, g: 0.04 }); break;
       case "turret": burst(A, out, { dur: 0.02, f: 2200, q: 3, g: 0.3 }); burst(A, out, { t: 0.07, dur: 0.03, f: 1500, q: 2, g: 0.35 }); tone(A, out, { f: 120, f2: 70, t: 0.07, dur: 0.1, g: 0.15 }); break;
@@ -2336,18 +2367,35 @@ async function irisTo({ from, title, steps, prepare, reveal, target, minMs = 110
   iris.hidden = true; busy = false;
 }
 /* Pull a slide across the stage: two stained bands sweep the screen. */
-async function wipeTo({ title, step = "", prepare = () => {}, reveal, minMs = 650 }) {
+/* Whip-pan between screens: no title card. The old screen flies off with motion blur, speed lines
+   streak across, and the new screen lands from the other side. Back sweeps right, forward sweeps left. */
+(function buildDash() {
+  const d = $("dash"), R = makeRng(4242, "dash"), cols = ["var(--acc)", "var(--acc-2)", "var(--ink)", "var(--acc)", "var(--muted)"];
+  for (let i = 0; i < 34; i++) {
+    const slab = i % 9 === 0, thick = i % 4 === 0;
+    const el = document.createElement("i");
+    const h = slab ? R.int(46, 90) : thick ? R.int(8, 16) : R.int(2, 5);
+    el.style.cssText = `--y:${(R() * 104 - 2).toFixed(1)}%;--h:${h}px;--w:${slab ? R.int(70, 110) : R.int(24, 60)}vw;--c:${slab ? (i % 2 ? "var(--acc)" : "var(--acc-2)") : cols[i % cols.length]};--o:${slab ? 0.95 : thick ? 0.9 : R.range(0.55, 0.9).toFixed(2)};--d:${slab ? R.int(340, 420) : R.int(260, 400)}ms;--t:${slab ? R.int(20, 90) : R.int(0, 150)}ms;--r:${slab ? "4px" : "99px"}`;
+    d.appendChild(el);
+  }
+})();
+async function wipeTo({ reveal, forward = false }) {
   busy = true;
-  const w = $("wipe");
-  $("wipeTitle").textContent = title; $("wipeStep").textContent = step;
-  if (prefersReduced()) { prepare(); reveal(); busy = false; return; }
-  w.hidden = false; w.className = "wipe in"; sfx("whoosh");
-  await wait(500);
-  const t0 = performance.now(); prepare(); reveal();
-  await wait(Math.max(0, minMs - (performance.now() - t0)));
-  w.className = "wipe out"; sfx("whooshOut");
-  await wait(540);
-  w.hidden = true; w.className = "wipe"; busy = false;
+  if (prefersReduced()) { reveal(); busy = false; return; }
+  const dash = $("dash"), from = screens[current], dir = forward ? -1 : 1, blur = isPhone() ? "" : " blur(8px)";
+  dash.hidden = false; dash.className = "dash"; void dash.offsetWidth; dash.className = "dash go" + (forward ? " fwd" : "");
+  sfx("dash");
+  const out = from.animate([{ transform: "none", filter: "none", opacity: 1 }, { transform: `translateX(${dir * 22}vw) skewX(${-dir * 6}deg)`, filter: `opacity(1)${blur}`, opacity: 0 }],
+    { duration: 190, easing: "cubic-bezier(.6, 0, .9, .5)", fill: "forwards" });
+  await out.finished.catch(() => {});
+  reveal();
+  out.cancel();
+  const to = screens[current];
+  window.scrollTo(0, 0);
+  await to.animate([{ transform: `translateX(${-dir * 18}vw) skewX(${-dir * 6}deg)`, filter: `opacity(1)${blur}`, opacity: 0 }, { transform: "none", filter: "none", opacity: 1 }],
+    { duration: 300, easing: "cubic-bezier(.12, .8, .2, 1)" }).finished.catch(() => {});
+  setTimeout(() => { dash.hidden = true; dash.className = "dash"; }, 160);
+  busy = false;
 }
 
 /* ---------- Menus: a sliding stained cursor, sound on every move ---------- */
@@ -3567,7 +3615,7 @@ $("pauseBtn").addEventListener("click", openPause);
 $("pause").addEventListener("click", (e) => { if (e.target === $("pause")) closePause(); });
 function quitToTitle() {
   TUT.stop();
-  wipeTo({ title: "Title", reveal: () => {
+  wipeTo({ reveal: () => {
     G = null; OBJ = MODES.bright.objs; show("title"); titleMenu.enter(); heroPose(+titleMenu.items[titleMenu.sel].dataset.pose, true);
     const wm = $("wordmark"); wm.classList.remove("focusing"); void wm.offsetWidth; if (!prefersReduced()) wm.classList.add("focusing");
     const s = titleMenu.items[titleMenu.sel]; if (s) $("titleCaption").textContent = captionFor(s.dataset.act);
@@ -3577,7 +3625,7 @@ function quitToTitle() {
 /* ---------- Results ---------- */
 const RANKS = [[2700, "S"], [2250, "A"], [1800, "B"], [1200, "C"], [0, "D"]];
 function finish() {
-  wipeTo({ title: "Scoring", step: "Measuring defocus · grading technique", reveal: finishNow, minMs: 700 });
+  wipeTo({ reveal: finishNow, forward: true });
 }
 function finishNow() {
   const total = G.results.reduce((a, r) => a + (r ? r.score : 0), 0);
