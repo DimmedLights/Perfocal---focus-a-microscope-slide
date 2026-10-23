@@ -4,17 +4,19 @@ Play it at **https://parfocal.vercel.app**
 
 A daily microscope game. Find the specimen at low power, swing in the next objective, add oil for the last one, and lock focus as close to the right plane as you can. Scoring is measured against each objective's real depth of field.
 
+Designed by Destiny, coded with Claude (Anthropic) as a collaborator.
+
 ## Modes
 
-- **Brightfield**: Gram- and Ziehl–Neelsen-stained bacterial smears (six organisms). Watch for dust on the coverslip, 170 µm above the smear.
-- **Fluorescence**: cultured cells labelled with DAPI, Alexa 488 (tubulin) and phalloidin-568 (actin). Pick the right filter cube for each target and close the shutter to limit photobleaching.
+- **Brightfield**: Gram- and Ziehl–Neelsen-stained smears of twelve organisms, from *S. aureus* clusters to *Candida* pseudohyphae and gonococci inside neutrophils. Six of them show a real micrograph at 100x. Watch for dust on the coverslip, 170 µm above the smear.
+- **Fluorescence**: drawn cultured cells labelled with DAPI, Alexa 488 (tubulin) and phalloidin-568 (actin), or a real three-channel field of HT29 cells (DNA, phospho-histone H3, cell body). Pick the right filter cube for each target and close the shutter to limit photobleaching.
 - **Confocal**: thick epithelial organoids with nuclear, membrane-GFP and lysosome layers at different depths. Out-of-focus planes go dark; the pinhole trades brightness against section thickness.
 
 Each mode has a shared daily slide plus random practice slides, timed or timeless play, and a guided tutorial round.
 
 ## Controls
 
-- Title menu: ↑ ↓ to choose, Enter to open, Q / E to switch microscope, T for timed or timeless, M for sound.
+- Title menu: ↑ ↓ to choose, Enter to open, Q / E to switch microscope, T for timed or timeless, M for sound, B for music.
 - In a round: ↑ ↓ fine focus, Shift + ↑ ↓ coarse, Enter to lock, O for oil, Esc to pause. The knob's outer ring is coarse and its centre is fine; spinning fast travels further.
 - On a phone the knob becomes two drag strips (Coarse and Fine).
 
@@ -36,6 +38,14 @@ Each mode has a shared daily slide plus random practice slides, timed or timeles
 
 It is a single static page with no build step. Open `index.html` in a browser, or deploy the folder to any static host. The live site deploys from `main` on Vercel.
 
-## Photographic plates (optional)
+## Photographs
 
-Specimens are drawn in code. If you add the photographs listed in `images/manifest.json` at the paths given there (for example `images/saureus-gram-01.jpg`), the 100x brightfield view uses the real micrograph and credits it automatically. Check each image's licence on its source page before adding it; CC BY-SA images must stay under the same licence when modified.
+`images/` holds the real micrographs, and `images/manifest.json` lists each one's author, licence, source page and the edits made (cropping, scale bars painted out). The modified CC BY-SA images are shared under the same licence. Everything else is drawn in code.
+
+## Music
+
+The soundtrack, "Coverslip Lounge", is an original generative jazz loop synthesised live in the browser (electric piano, bass, brushes, vibraphone and a pad). It turns down and muffles while you focus, opens up in menus, and ducks under the victory tune.
+
+## Inspiration
+
+The one-slide-a-day format comes from [dialed.gg](https://dialed.gg). The menus take their energy from *Persona 3 Reload* (Atlus), borrowing ideas only: tilted type, a highlight that slides between choices, and diagonal screen cuts. No Atlus art, type or sound is used.

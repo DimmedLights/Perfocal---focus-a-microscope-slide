@@ -102,19 +102,34 @@ kbd { font-family: var(--f-mono); font-size: 10.5px; line-height: 1; padding: 3p
 ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 .theme-anim, .theme-anim * { transition: background-color .6s ease, color .6s ease, border-color .6s ease, fill .6s ease, stroke .6s ease, box-shadow .6s ease !important; }
 
-/* ---------- Top bar ---------- */
-.topbar { position: relative; z-index: 20; }
-.topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-block: 14px 6px; flex-wrap: wrap; }
-.clock { display: flex; flex-direction: column; line-height: 1.3; padding-bottom: 7px; border-bottom: 1px solid var(--line); min-width: 150px; }
-.clock .date { font-size: 12.5px; color: var(--muted); }
-.clock .time { display: flex; align-items: center; gap: 7px; font-family: var(--f-mono); font-size: 16px; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
-.clock .time svg { width: 16px; height: 16px; }
-.who { display: flex; align-items: center; gap: 10px; }
-.who b { font-weight: 700; font-size: 15px; margin-right: 2px; }
-.pfp { width: 40px; height: 40px; border-radius: 12px; object-fit: cover; box-shadow: 0 0 0 1px var(--glass-edge), var(--shadow); }
-.pill { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; font-size: 14.5px; font-weight: 500; text-decoration: none; color: var(--ink);
-  background: var(--glass-strong); border: 1px solid var(--glass-edge); box-shadow: var(--shadow), var(--hi); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
-.pill svg { width: 16px; height: 16px; }
+/* ---------- Header: brand on the left, a small cluster of controls on the right ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.topbar { position: sticky; top: 0; z-index: 30; border-bottom: 1px solid transparent; transition: background-color .3s, border-color .3s; }
+.topbar.scrolled { background: color-mix(in srgb, var(--bg) 80%, transparent); -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); border-bottom-color: var(--line); }
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 14px; height: 64px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; border-radius: 10px; }
+.brand-mark { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid var(--acc); display: grid; place-items: center; transition: border-color .4s, transform .5s var(--e-pop); }
+.brand-mark i { width: 7px; height: 7px; border-radius: 50%; background: var(--acc); box-shadow: 3px 0 0 -1px var(--acc-2); transition: background-color .4s, transform .3s var(--e-pop); }
+.brand:hover .brand-mark { transform: rotate(-90deg); }
+.brand:hover .brand-mark i { transform: scale(1.35); }
+.brand-name { font: italic 900 17px/1 var(--f-display); font-stretch: 112%; letter-spacing: 0; text-transform: uppercase; transition: opacity .3s, transform .35s var(--e-snap); }
+body[data-screen="title"] .brand-name { opacity: 0; transform: translateX(-8px); }
+body[data-screen="title"] .brand { pointer-events: none; }
+.top-actions { display: flex; align-items: center; gap: 14px; }
+.icon-group { display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; background: var(--glass); border: 1px solid var(--glass-edge); box-shadow: var(--hi); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.ibtn { width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; border: 0; background: none; color: var(--ink-2); text-decoration: none; transition: color .2s, background-color .2s; }
+.ibtn:hover { color: var(--ink); background: var(--glass-strong); }
+.ibtn svg { width: 17px; height: 17px; }
+.ibtn .eq { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
+.ibtn .eq i { width: 3px; height: 100%; border-radius: 2px; background: var(--acc); transform-origin: 50% 100%; transform: scaleY(.45); animation: eq 1s ease-in-out infinite paused; }
+#musicBtn.live .eq i { animation-play-state: running; }
+.ibtn .eq i:nth-child(2) { animation-duration: .8s; animation-delay: -.3s; } .ibtn .eq i:nth-child(3) { animation-duration: 1.15s; animation-delay: -.6s; } .ibtn .eq i:nth-child(4) { animation-duration: .9s; animation-delay: -.15s; }
+@keyframes eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+#musicBtn[aria-pressed="true"] .note, #musicBtn[aria-pressed="false"] .eq { display: none; }
+#musicBtn[aria-pressed="true"] { color: var(--acc); }
+.who { display: inline-flex; align-items: center; gap: 10px; }
+.who-name { font-weight: 600; font-size: 14px; color: var(--ink-2); }
+.pfp { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--line-strong); }
 
 /* ---------- Glass, shine, buttons ---------- */
 .shine { position: relative; overflow: hidden; isolation: isolate; }
@@ -217,7 +232,7 @@ kbd { font-family: var(--f-mono); font-size: 10.5px; line-height: 1; padding: 3p
 @keyframes mIn { from { translate: -90px 0; opacity: 0; } }
 @keyframes mOut { to { translate: -120px 0; opacity: 0; } }
 @keyframes cursorIn { from { opacity: 0; } }
-.m-caption { min-height: 1.6em; margin: 14px 0 0 30px; font-size: 15px; color: var(--ink-2); max-width: 34em; }
+.m-caption { min-height: 3.2em; line-height: 1.6; margin: 14px 0 0 30px; font-size: 15px; color: var(--ink-2); max-width: 34em; }
 .m-caption.swap { animation: capIn .32s var(--e-snap); }
 @keyframes capIn { from { opacity: 0; transform: translateY(6px); } }
 
@@ -472,6 +487,7 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
 .mcard p { margin: 0; font-size: 13.5px; }
 .mcard .spec { margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); font: 500 11.5px var(--f-mono); color: var(--muted); }
 .credits p { margin: 0 0 12px; }
+.credits h3:not(:first-child) { margin-top: 28px; }
 .credits a { color: var(--acc); }
 .credits ul { padding-left: 18px; color: var(--ink-2); }
 
@@ -651,9 +667,8 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
   .share-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 520px) {
-  .who b { display: none; }
-  .pill span { display: none; }
-  .pill { padding: 0 12px; }
+  .who-name { display: none; }
+  .top-actions { gap: 10px; }
   .share-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mode-arrow { display: none; }
   .mode-tabs { flex: 1 1 auto; }
@@ -668,20 +683,24 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
 </style>
 </head>
 <body>
-<div class="topbar gutter">
+<header class="topbar gutter" id="topbar">
   <div class="wrap">
-    <div class="clock">
-      <span class="date" id="tbDate">&nbsp;</span>
-      <span class="time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="tbTime">--:--:--</span></span>
-    </div>
-    <div class="who">
-      <b>Destiny</b>
-      <img class="pfp" src="data:image/jpeg;base64,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" alt="Destiny's profile picture">
-      <button class="pill shine" id="themeBtn" aria-label="Switch theme"><svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg><span id="themeText">Light</span></button>
-      <a class="pill shine" href="https://github.com/DimmedLights" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.29-1.69-1.29-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.27 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg><span>GitHub</span></a>
+    <a class="brand" id="brand" href="#" aria-label="Parfocal, back to the title screen">
+      <span class="brand-mark" aria-hidden="true"><i></i></span><span class="brand-name">Parfocal</span>
+    </a>
+    <div class="top-actions">
+      <div class="icon-group" role="group" aria-label="Settings and links">
+        <button class="ibtn shine" id="musicBtn" aria-pressed="false" aria-label="Music" title="Music (B)">
+          <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <svg class="note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>
+        </button>
+        <button class="ibtn shine" id="themeBtn" aria-label="Switch theme" title="Theme"><svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg><span id="themeText" class="sr-only">Light</span></button>
+        <a class="ibtn shine" href="https://github.com/DimmedLights" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.29-1.69-1.29-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.27 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg></a>
+      </div>
+      <span class="who"><span class="who-name">Destiny</span><img class="pfp" src="data:image/jpeg;base64,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" alt="Destiny's profile picture"></span>
     </div>
   </div>
-</div>
+</header>
 
 <!-- ============ TITLE ============ -->
 <main id="title" class="screen title-screen">
@@ -991,7 +1010,8 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
         <button class="m-item" role="menuitem" data-act="restart" style="--i:1"><span class="m-idx">02</span><span class="m-name">Restart slide</span></button>
         <button class="m-item" role="menuitem" data-act="controls" style="--i:2"><span class="m-idx">03</span><span class="m-name">Controls</span></button>
         <button class="m-item" role="menuitem" data-act="sound" style="--i:3"><span class="m-idx">04</span><span class="m-name" id="pauseSound">Sound on</span></button>
-        <button class="m-item" role="menuitem" data-act="quit" style="--i:4"><span class="m-idx">05</span><span class="m-name">Quit to title</span></button>
+        <button class="m-item" role="menuitem" data-act="music" style="--i:4"><span class="m-idx">05</span><span class="m-name" id="pauseMusic">Music on</span></button>
+        <button class="m-item" role="menuitem" data-act="quit" style="--i:5"><span class="m-idx">06</span><span class="m-name">Quit to title</span></button>
       </nav>
       <div class="pause-ctx" id="pauseCtx" aria-live="polite"></div>
     </div>
@@ -1082,13 +1102,7 @@ const $ = (id) => document.getElementById(id);
 const prefersReduced = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const isPhone = () => !!(window.matchMedia && window.matchMedia("(max-width: 760px)").matches);
 
-/* ---------- Top bar: clock and theme ---------- */
-function tickClock() {
-  const now = new Date();
-  $("tbDate").textContent = now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
-  $("tbTime").textContent = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-}
-tickClock(); setInterval(tickClock, 1000);
+/* ---------- Header: theme ---------- */
 const root = document.documentElement;
 const mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 const isDark = () => root.getAttribute("data-theme") ? root.getAttribute("data-theme") === "dark" : !!(mq && mq.matches);
@@ -1154,7 +1168,8 @@ const MODES = {
 };
 const confocalSection = (lam, n, NA) => 0.88 * lam / (n - Math.sqrt(n * n - NA * NA));
 Object.values(MODES).forEach(m => m.objs.forEach(o => {
-  o.s = 0.08 * o.mag;
+  // display scale in px per µm; brightfield 100x is drawn closer, to match the photographic plates
+  o.s = m.id === "bright" && o.mag === 100 ? 12 : 0.08 * o.mag;
   o.dof = m.id === "confocal" ? confocalSection(m.lam, o.n, o.NA) : m.lam * o.n / (o.NA * o.NA);
 }));
 let OBJ = MODES.bright.objs;
@@ -1178,12 +1193,14 @@ function sigmaPx(o, e, dz) {
 
 /* ---------- Specimens ---------- */
 const PLATES = {
-  saureus:     { file: "images/saureus-gram-01.jpg",     credit: "Staphylococcus aureus, Gram stain. Y tambe, Wikimedia Commons, CC BY-SA 3.0. Cropped and blurred.", url: "https://commons.wikimedia.org/wiki/File:Staphylococcus_aureus_Gram.jpg" },
-  ecoli:       { file: "images/ecoli-gram-01.jpg",       credit: "Escherichia coli, Gram stain. Dr Graham Beards, Wikimedia Commons, CC BY-SA 4.0. Cropped and blurred.", url: "https://commons.wikimedia.org/wiki/File:Escherichia_coli_Gram_Stain.jpg" },
-  spneumoniae: { file: "images/spneumoniae-gram-01.jpg", credit: "Streptococcus pneumoniae, Gram stain. Arnold Kaufman / CDC PHIL #21340. Public domain.", url: "https://commons.wikimedia.org/wiki/File:Gram_stain_of_Streptococcus_pneumoniae.jpg" },
-  bsubtilis:   { file: "images/bsubtilis-gram-01.jpg",   credit: "Bacillus subtilis, Gram stain. Dr Graham Beards, Wikimedia Commons, CC BY-SA 4.0. Cropped and blurred.", url: "https://commons.wikimedia.org/wiki/File:Bacillus_subtilis_2.jpg" },
-  mtb:         { file: "images/mtb-zn-01.jpg",           credit: "Mycobacterium tuberculosis, Ziehl-Neelsen stain. CDC Public Health Image Library. Public domain.", url: "https://commons.wikimedia.org/wiki/File:Mycobacterium_tuberculosis_Ziehl-Neelsen_stain_02.jpg" },
-  sagalactiae: { file: "images/sagalactiae-gram-01.jpg", credit: "Streptococcus agalactiae, Gram stain. K.-E. Johansson & L.-L. Fernström, Wikimedia Commons, CC BY 2.5 SE. Cropped and blurred.", url: "https://commons.wikimedia.org/wiki/File:Gram_stain_of_Streptococcus_agalactiae.jpg" },
+  saureus:     { file: "images/saureus-gram-01.jpg",     credit: "Staphylococcus aureus ATCC 25923, Gram stain, 1000x. Y Tambe, Wikimedia Commons, CC BY-SA 3.0. Cropped, scale bar removed, blurred in play.", url: "https://commons.wikimedia.org/wiki/File:Staphylococcus_aureus_Gram.jpg" },
+  ecoli:       { file: "images/ecoli-gram-01.jpg",       credit: "Escherichia coli, Gram stain. Dr Graham Beards, Wikimedia Commons, CC BY-SA 4.0. Cropped, blurred in play.", url: "https://commons.wikimedia.org/wiki/File:Escherichia_coli_Gram_Stain.jpg" },
+  spneumoniae: { file: "images/spneumoniae-gram-01.jpg", credit: "Streptococcus pneumoniae, Gram stain. Arnold Kaufman, CDC Public Health Image Library #21340, via Wikimedia Commons. CC0.", url: "https://commons.wikimedia.org/wiki/File:Gram_stain_of_Streptococcus_pneumoniae.jpg" },
+  bsubtilis:   { file: "images/bsubtilis-gram-01.jpg",   credit: "Bacillus subtilis, Gram stain. Dr Graham Beards, Wikimedia Commons, CC BY-SA 4.0. Cropped, scale bar removed, blurred in play.", url: "https://commons.wikimedia.org/wiki/File:Bacillus_subtilis_2.jpg" },
+  mtb:         { file: "images/mtb-zn-01.jpg",           credit: "Mycobacterium tuberculosis, Ziehl–Neelsen stain, 1000x. Dr George P. Kubica, CDC Public Health Image Library #5789, via Wikimedia Commons. Public domain.", url: "https://commons.wikimedia.org/wiki/File:Mycobacterium_tuberculosis_Ziehl-Neelsen_stain_02.jpg" },
+  sagalactiae: { file: "images/sagalactiae-gram-01.jpg", credit: "Streptococcus agalactiae, Gram stain. Karl-Erik Johansson and Lise-Lotte Fernström (SLU), VetBact.org, via Wikimedia Commons. CC BY 2.5 SE. Cropped, scale bar removed, blurred in play.", url: "https://commons.wikimedia.org/wiki/File:Gram_stain_of_Streptococcus_agalactiae.jpg" },
+  ht29:        { files: { dapi: "images/ht29-dna.jpg", fitc: "images/ht29-ph3.jpg", tritc: "images/ht29-cell.jpg" },
+                 credit: "HT29 human colon cancer cells: DNA, phospho-histone H3 and cell body. Jason Moffat (Moffat et al., Cell 2006), from the CellProfiler example images. CC0. Contrast set, cropped and tinted in play.", url: "https://github.com/CellProfiler/examples/tree/master/ExampleHuman" },
 };
 const ORGS = [
   { id: "saureus", name: "Staphylococcus aureus", stain: "Gram stain", gram: "Gram-positive", shape: "Cocci", arr: "Grape-like clusters", size: "0.8–1 µm",
@@ -1198,12 +1215,27 @@ const ORGS = [
     why: "Endospores have a tough coat that the Gram stain cannot penetrate, so they show up as clear ovals inside purple rods." },
   { id: "mtb", name: "Mycobacterium tuberculosis", stain: "Ziehl–Neelsen stain", gram: "Acid-fast", shape: "Slender rods", arr: "Singles, loose cords", size: "0.3 × 2–4 µm",
     why: "Mycolic acids in the wall trap hot carbol fuchsin, which survives the acid-alcohol wash. Everything else gives up the dye and picks up the blue methylene counterstain." },
+  { id: "ngonorrhoeae", name: "Neisseria gonorrhoeae", stain: "Gram stain", gram: "Gram-negative", shape: "Kidney-bean cocci", arr: "Pairs, often inside neutrophils", size: "0.6–1 µm",
+    why: "The cells divide and stay paired with their facing sides flattened, like two kidney beans. In a urethral smear, Gram-negative diplococci inside neutrophils are close to diagnostic of gonorrhoea." },
+  { id: "calbicans", name: "Candida albicans", stain: "Gram stain", gram: "Gram-positive", shape: "Budding yeast", arr: "Singles, buds, pseudohyphae", size: "3–6 µm",
+    why: "A fungus, not a bacterium, so the cells are several times bigger than anything else on these slides. It reproduces by budding; buds that elongate and stay attached form pseudohyphae, chains pinched at every septum." },
+  { id: "cperfringens", name: "Clostridium perfringens", stain: "Gram stain", gram: "Gram-positive", shape: "Large blunt rods", arr: "Singles, short chains", size: "1 × 3–5 µm",
+    why: "Big rods with square-cut ends that line up like boxcars. Unlike most clostridia it rarely shows spores on a smear, and it is non-motile." },
+  { id: "cdiphtheriae", name: "Corynebacterium diphtheriae", stain: "Gram stain", gram: "Gram-positive", shape: "Club-shaped rods", arr: "V, L and palisades", size: "0.5 × 1.5–4 µm",
+    why: "When a cell divides, the outer wall snaps on one side only, so the daughters hinge into V and L shapes and stack into palisades. Rods packed at angles like this are called Chinese letters." },
+  { id: "vcholerae", name: "Vibrio cholerae", stain: "Gram stain", gram: "Gram-negative", shape: "Curved rods", arr: "Single, comma-shaped", size: "0.5 × 1.5–3 µm",
+    why: "The comma shape comes from CrvA, a filament that collects along the inner curve and slows growth on that side. The curve helps it swim through gut mucus on a single polar flagellum, too thin to see in a Gram stain." },
+  { id: "kpneumoniae", name: "Klebsiella pneumoniae", stain: "Gram stain", gram: "Gram-negative", shape: "Plump rods", arr: "Singles and pairs, capsulated", size: "0.5–1 × 1–2 µm",
+    why: "A thick polysaccharide capsule surrounds each rod and doesn't take up the stain, so the cells sit in clear halos. The capsule makes the colonies mucoid and helps it resist being engulfed by neutrophils." },
 ];
 const orgById = Object.fromEntries(ORGS.map(o => [o.id, o]));
 const SPEC_INFO = {
   hela: { name: "HeLa cells", stain: "Immunofluorescence · three labels",
     facts: [["DAPI", "DNA · ex 358 / em 461 nm"], ["Alexa Fluor 488", "α-tubulin · ex 495 / em 519 nm"], ["Phalloidin-568", "F-actin · ex 578 / em 600 nm"], ["Filter cube", "Exciter, dichroic, emitter"]],
     why: "A fluorophore absorbs one colour and emits a longer one; that gap is the Stokes shift. The filter cube passes one excitation band in and one emission band out, so you see one label at a time. Widefield collects out-of-focus light too, which is why blurred planes glow as haze." },
+  ht29: { name: "HT29 colon cancer cells", stain: "Widefield · DNA / phospho-histone H3 / cell body", plateId: "ht29",
+    facts: [["DAPI cube", "DNA stain · every nucleus"], ["FITC cube", "Anti-phospho-histone H3 · dividing cells"], ["TRITC cube", "Cell-body stain · cytoplasm and edges"], ["Field", "Real photograph, CC0"]],
+    why: "Histone H3 is phosphorylated as chromosomes condense for mitosis, so the PH3 antibody lights up only the cells that are dividing: a bright few among hundreds of nuclei. This field comes from an RNAi screen that counted them to find genes that control cell division." },
   organoid: { name: "Epithelial organoid", stain: "Confocal · DAPI / membrane-GFP / LysoTracker Red",
     facts: [["405 nm laser", "DAPI nuclei"], ["488 nm laser", "Membrane-GFP outlines"], ["561 nm laser", "LysoTracker Red · lysosomes"], ["Pinhole", "Conjugate to the focal spot"]],
     why: "The pinhole sits in a plane conjugate to the focused laser spot, so light from above and below the focal plane misses it. Out-of-focus structures go dark instead of blurring, which is how a confocal takes clean optical sections through a thick sample." },
@@ -1213,13 +1245,19 @@ const CH = { dapi: { rgb: [90, 125, 255], name: "DAPI" }, fitc: { rgb: [63, 224,
 
 const plateImgs = {};
 function loadPlates(done) {
-  let pending = ORGS.length;
-  ORGS.forEach(o => {
-    const img = new Image();
-    img.onload = () => { plateImgs[o.id] = img; if (--pending === 0) done(); };
-    img.onerror = () => { if (--pending === 0) done(); };
-    img.src = PLATES[o.id].file;
-  });
+  const jobs = [];
+  for (const [id, p] of Object.entries(PLATES)) {
+    const srcs = p.file ? { _: p.file } : p.files;
+    const got = {};
+    for (const [k, src] of Object.entries(srcs)) jobs.push(new Promise((res) => {
+      const img = new Image();
+      img.onload = () => { got[k] = img; res(); };
+      img.onerror = () => res();
+      img.src = src;
+    }));
+    Promise.all(jobs).then(() => { if (Object.keys(got).length === Object.keys(srcs).length) plateImgs[id] = p.file ? got._ : got; });
+  }
+  Promise.all(jobs).then(() => setTimeout(done, 0));
 }
 
 /* ---------- Verdict copy ---------- */
@@ -1261,9 +1299,12 @@ function genBright(seed, orgId) {
   const density = densityField(D, D.int(9, 15), 380);
   const cells = [];
   const C = makeRng(seed, "cells");
-  const groups = { saureus: 230, sagalactiae: 200, spneumoniae: 520, ecoli: 1700, bsubtilis: 360, mtb: 300 }[orgId];
+  const groups = { saureus: 230, sagalactiae: 200, spneumoniae: 520, ecoli: 1700, bsubtilis: 360, mtb: 300,
+    ngonorrhoeae: 260, calbicans: 130, cperfringens: 260, cdiphtheriae: 300, vcholerae: 1100, kpneumoniae: 650 }[orgId];
+  const pmns = [];
+  const centre = !PLATES[orgId]; // drawn-only organisms gather where the 100x field will look
   for (let g = 0; g < groups; g++) {
-    const [gx, gy] = C.inDisk(140);
+    const [gx, gy] = centre && g < groups * 0.35 ? [C.normal(0, 20), C.normal(0, 20)] : C.inDisk(140);
     if (C() > density(gx, gy)) continue;
     const gz = C.normal(0, 0.25);
     const add = (c) => { c.z = gz + C.normal(0, 0.18); cells.push(c); };
@@ -1292,6 +1333,58 @@ function genBright(seed, orgId) {
         x += Math.cos(a) * (l / 2 + 0.08) + Math.cos(na) * (l / 2); y += Math.sin(a) * (l / 2 + 0.08) + Math.sin(na) * (l / 2);
         a = na;
       }
+    } else if (orgId === "ngonorrhoeae") {
+      // kidney-bean pairs, flattened where they face each other
+      const a = C.range(0, Math.PI * 2), ca = Math.cos(a), sa = Math.sin(a);
+      add({ t: "bean", x: gx - ca * 0.4, y: gy - sa * 0.4, a, rx: 0.34, ry: 0.52 });
+      add({ t: "bean", x: gx + ca * 0.4, y: gy + sa * 0.4, a: a + Math.PI, rx: 0.34, ry: 0.52 });
+    } else if (orgId === "calbicans") {
+      const a = C.range(0, Math.PI * 2);
+      if (C.chance(0.25)) {
+        // pseudohypha: elongated cells end to end, pinched at each septum
+        let x = gx, y = gy, h = a;
+        const n = C.int(3, 7);
+        for (let i = 0; i < n; i++) {
+          const rx = C.range(2.2, 3.0);
+          add({ t: "yeast", x, y, a: h, rx, ry: C.range(0.8, 1.0) });
+          if (C.chance(0.3)) add({ t: "yeast", x: x - Math.sin(h) * 1.6, y: y + Math.cos(h) * 1.6, a: h + 1.4, rx: 1.0, ry: 0.8 });
+          const nh = h + C.normal(0, 0.22);
+          x += Math.cos(h) * rx + Math.cos(nh) * C.range(2.2, 3.0); y += Math.sin(h) * rx + Math.sin(nh) * C.range(2.2, 3.0); h = nh;
+        }
+      } else {
+        const rx = C.range(1.6, 2.4), ry = rx * C.range(0.7, 0.85);
+        add({ t: "yeast", x: gx, y: gy, a, rx, ry });
+        if (C.chance(0.55)) { const br = C.range(0.45, 0.8); add({ t: "yeast", x: gx + Math.cos(a) * (rx + rx * br * 0.85), y: gy + Math.sin(a) * (rx + rx * br * 0.85), a, rx: rx * br, ry: ry * br }); }
+      }
+    } else if (orgId === "cperfringens") {
+      let a = C.range(0, Math.PI * 2), x = gx, y = gy;
+      const n = C.chance(0.55) ? 1 : C.int(2, 4);
+      for (let i = 0; i < n; i++) {
+        const l = C.range(3, 5);
+        add({ t: "rod", x, y, a, w: 1.05, l, box: true });
+        const na = a + C.normal(0, 0.1);
+        x += Math.cos(a) * (l / 2 + 0.12) + Math.cos(na) * (l / 2); y += Math.sin(a) * (l / 2 + 0.12) + Math.sin(na) * (l / 2); a = na;
+      }
+    } else if (orgId === "cdiphtheriae") {
+      const a = C.range(0, Math.PI * 2), form = C();
+      const rod = (x, y, ang) => add({ t: "rod", x, y, a: ang, w: 0.55, l: C.range(1.5, 3.5), club: C.chance(0.5) ? 1 : -1 });
+      if (form < 0.4) {
+        // V or L: two cells hinged at one end
+        const open = C.range(0.4, 1.4), l = C.range(1.6, 3);
+        const hx = gx, hy = gy;
+        for (const s of [-1, 1]) { const ang = a + s * open / 2; add({ t: "rod", x: hx + Math.cos(ang) * l / 2, y: hy + Math.sin(ang) * l / 2, a: ang, w: 0.55, l, club: 1 }); }
+      } else if (form < 0.7) {
+        // palisade: parallel rods side by side
+        const n = C.int(3, 6);
+        for (let i = 0; i < n; i++) rod(gx - Math.sin(a) * i * 0.72 + Math.cos(a) * C.normal(0, 0.35), gy + Math.cos(a) * i * 0.72 + Math.sin(a) * C.normal(0, 0.35), a + C.normal(0, 0.08));
+      } else rod(gx, gy, a);
+    } else if (orgId === "vcholerae") {
+      const a = C.range(0, Math.PI * 2), side = C.chance(0.5) ? 1 : -1;
+      add({ t: "bent", x: gx, y: gy, a, w: 0.55, l: C.range(1.6, 2.6), bend: side * C.range(0.35, 0.55) });
+    } else if (orgId === "kpneumoniae") {
+      const a = C.range(0, Math.PI * 2), l = C.range(1.3, 2.3);
+      add({ t: "rod", x: gx, y: gy, a, w: 0.85, l, capsule: true });
+      if (C.chance(0.3)) add({ t: "rod", x: gx + Math.cos(a) * (l + 0.5), y: gy + Math.sin(a) * (l + 0.5), a: a + C.normal(0, 0.12), w: 0.85, l: C.range(1.3, 2.1), capsule: true });
     } else if (orgId === "mtb") {
       const cord = C.chance(0.35);
       const n = cord ? C.int(3, 9) : 1, a = C.range(0, Math.PI * 2);
@@ -1299,6 +1392,29 @@ function genBright(seed, orgId) {
         const off = cord ? C.normal(0, 0.9) : 0, sl = cord ? C.normal(0, 1.2) : 0;
         add({ t: "bent", x: gx - Math.sin(a) * off + Math.cos(a) * sl, y: gy + Math.cos(a) * off + Math.sin(a) * sl,
               a: a + C.normal(0, cord ? 0.12 : 0.6), w: 0.35, l: C.range(1.6, 4), bend: C.normal(0, 0.35) });
+      }
+    }
+  }
+  if (orgId === "ngonorrhoeae") {
+    const P = makeRng(seed, "pmn");
+    for (let i = 0; i < 120 && pmns.length < 46; i++) {
+      const [x, y] = i < 3 ? P.inDisk(25) : P.inDisk(150);
+      if (P() > density(x, y) * 1.2 || pmns.some(q => Math.hypot(q.x - x, q.y - y) < 13)) continue;
+      const pm = { t: "pmn", x, y, r: P.range(5.2, 6.4), seed: P.int(0, 1e6) };
+      const nl = P.int(3, 5), a0 = P.range(0, 6.28), R0 = pm.r * 0.34;
+      pm.lobes = [];
+      for (let l = 0; l < nl; l++) {
+        const a = a0 + (l - (nl - 1) / 2) * 0.9;
+        pm.lobes.push({ x: x + Math.cos(a) * R0 + P.normal(0, 0.25), y: y + Math.sin(a) * R0 + P.normal(0, 0.25), rx: pm.r * P.range(0.2, 0.27), ry: pm.r * P.range(0.15, 0.2), a: a + Math.PI / 2 + P.normal(0, 0.35) });
+      }
+      pmns.push(pm);
+      if (P.chance(0.6)) {
+        const n = P.int(4, 14), z = P.normal(0, 0.2);
+        for (let k = 0; k < n; k++) {
+          const [dx, dy] = P.inDisk(pm.r * 0.75), a = P.range(0, Math.PI * 2), ca = Math.cos(a), sa = Math.sin(a);
+          cells.push({ t: "bean", x: x + dx - ca * 0.4, y: y + dy - sa * 0.4, a, rx: 0.34, ry: 0.52, z });
+          cells.push({ t: "bean", x: x + dx + ca * 0.4, y: y + dy + sa * 0.4, a: a + Math.PI, rx: 0.34, ry: 0.52, z });
+        }
       }
     }
   }
@@ -1317,10 +1433,12 @@ function genBright(seed, orgId) {
     debris.push(zn ? { t: "nucleus", x, y, r: B.range(3.5, 7), lobes: B.int(1, 3), a: B.range(0, 6.28) } : { t: "ppt", x, y, r: B.range(0.4, 2.2), a: B.range(0, 6.28) });
   }
   return {
-    kind: "bright", orgId, blobs: density.blobs, cells, clumps, debris, dust: genDust(seed),
+    kind: "bright", orgId, blobs: density.blobs, cells, clumps, debris: debris.concat(pmns), dust: genDust(seed),
     targets: [{ z: 0, label: "the smear" }, { z: 0, label: "the cells" }, { z: 0, label: "the cells" }],
     stain: zn ? { body: [196, 32, 86], rim: [120, 10, 50] } : pos ? { body: [88, 46, 140], rim: [44, 18, 82] } : { body: [214, 98, 138], rim: [150, 44, 86] },
-    bg: zn ? { c: [236, 242, 250], e: [200, 212, 230], haze: [96, 128, 186] } : { c: [250, 247, 242], e: [222, 216, 211], haze: pos ? [120, 90, 160] : [214, 140, 170] },
+    bg: zn ? { c: [236, 242, 250], e: [200, 212, 230], haze: [96, 128, 186] }
+      : orgId === "kpneumoniae" ? { c: [243, 222, 230], e: [214, 190, 202], haze: [214, 140, 170] }
+      : { c: [250, 247, 242], e: [222, 216, 211], haze: pos ? [120, 90, 160] : [214, 140, 170] },
   };
 }
 function genDust(seed) {
@@ -1433,8 +1551,21 @@ function genOrganoid(seed) {
     targets: [{ z: 0, ch: "dapi", label: "nuclei layer", tag: "405 nm" }, { z: zG, ch: "gfp", label: "membrane-GFP layer", tag: "488 nm" }, { z: zR, ch: "red", label: "lysosome layer", tag: "561 nm" }] };
 }
 
+/* A real widefield field (HT29 cells, CC0). Each objective shows a crop centred on a dividing cell. */
+const HT29_CENTRES = [[402, 364], [384, 269], [187, 322]];
+function genHT29(seed) {
+  const R = makeRng(seed, "ht29");
+  const [cx, cy] = HT29_CENTRES[R.int(0, HT29_CENTRES.length - 1)];
+  const win = (size) => [clamp01(cx - size / 2, 512 - size), clamp01(cy - size / 2, 512 - size), size];
+  const zN = R.range(2.6, 3.6), zP = zN + R.range(0.3, 0.6);
+  return { kind: "fluor", plate: "ht29", info: "ht29", cells: [], chZ: { tritc: 0, fitc: zP, dapi: zN },
+    crops: [[0, 0, 512], win(300), win(200)],
+    targets: [{ z: zN, ch: "dapi", label: "nuclei", tag: "DNA stain" }, { z: zP, ch: "fitc", label: "dividing cells", tag: "anti-PH3" }, { z: 0, ch: "tritc", label: "cell edges", tag: "cell-body stain" }] };
+}
+function clamp01(v, hi) { return Math.max(0, Math.min(hi, Math.round(v))); }
+
 function genSpecimen(seed, mode, orgId) {
-  if (mode === "fluor") return genHela(seed);
+  if (mode === "fluor") return (makeRng(seed, "kind")() < 0.5 && plateImgs.ht29) ? genHT29(seed) : genHela(seed);
   if (mode === "confocal") return genOrganoid(seed);
   return genBright(seed, orgId);
 }
@@ -1459,14 +1590,36 @@ function drawCell(ctx, c, sp, s) {
     ctx.fillStyle = rim; ctx.fill();
     ctx.beginPath(); ctx.ellipse(-c.rx * 0.1, 0, c.rx * 0.6, c.ry * 0.6, 0, 0, Math.PI * 2); ctx.fillStyle = body; ctx.fill();
     ctx.restore();
+  } else if (c.t === "bean") {
+    // a coccus flattened on the side that faces its partner
+    ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.a);
+    const kb = (r) => { ctx.beginPath(); ctx.moveTo(-c.rx * r * 0.55, -c.ry * r); ctx.bezierCurveTo(c.rx * r * 1.25, -c.ry * r * 1.05, c.rx * r * 1.25, c.ry * r * 1.05, -c.rx * r * 0.55, c.ry * r); ctx.quadraticCurveTo(-c.rx * r * 0.85, 0, -c.rx * r * 0.55, -c.ry * r); };
+    kb(1); ctx.fillStyle = rim; ctx.fill();
+    kb(0.62); ctx.fillStyle = body; ctx.fill();
+    ctx.restore();
+  } else if (c.t === "yeast") {
+    ctx.beginPath(); ctx.ellipse(c.x, c.y, c.rx, c.ry, c.a, 0, Math.PI * 2); ctx.fillStyle = rim; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(c.x - c.rx * 0.08, c.y - c.ry * 0.08, c.rx * 0.78, c.ry * 0.74, c.a, 0, Math.PI * 2); ctx.fillStyle = body; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(c.x + Math.cos(c.a) * c.rx * 0.2, c.y + Math.sin(c.a) * c.rx * 0.2, c.rx * 0.28, c.ry * 0.3, c.a, 0, Math.PI * 2); ctx.fillStyle = rgba(sp.stain.rim, 0.5); ctx.fill();
   } else if (c.t === "rod" || c.t === "bent") {
-    const hx = Math.cos(c.a) * (c.l - c.w) / 2, hy = Math.sin(c.a) * (c.l - c.w) / 2;
-    ctx.lineCap = "round";
+    if (c.capsule) {
+      ctx.save(); ctx.lineCap = "round"; ctx.strokeStyle = "rgba(255,253,252,0.9)"; ctx.lineWidth = c.w + 1.3;
+      const qx = Math.cos(c.a) * (c.l - c.w) / 2, qy = Math.sin(c.a) * (c.l - c.w) / 2;
+      ctx.beginPath(); ctx.moveTo(c.x - qx, c.y - qy); ctx.lineTo(c.x + qx, c.y + qy); ctx.stroke(); ctx.restore();
+    }
+    const hl = c.box ? c.l / 2 : (c.l - c.w) / 2;
+    const hx = Math.cos(c.a) * hl, hy = Math.sin(c.a) * hl;
+    ctx.lineCap = c.box ? "butt" : "round";
     ctx.beginPath(); ctx.moveTo(c.x - hx, c.y - hy);
     if (c.t === "bent") ctx.quadraticCurveTo(c.x - Math.sin(c.a) * c.bend, c.y + Math.cos(c.a) * c.bend, c.x + hx, c.y + hy);
     else ctx.lineTo(c.x + hx, c.y + hy);
     ctx.strokeStyle = rim; ctx.lineWidth = Math.max(c.w, minW); ctx.stroke();
     ctx.strokeStyle = body; ctx.lineWidth = Math.max(c.w * 0.58, minW * 0.6); ctx.stroke();
+    if (c.club) {
+      // a swollen end: the club of a corynebacterium
+      ctx.beginPath(); ctx.arc(c.x + hx * c.club, c.y + hy * c.club, c.w * 0.68, 0, Math.PI * 2); ctx.fillStyle = rim; ctx.fill();
+      ctx.beginPath(); ctx.arc(c.x + hx * c.club, c.y + hy * c.club, c.w * 0.36, 0, Math.PI * 2); ctx.fillStyle = body; ctx.fill();
+    }
     if (c.spore != null) {
       const sx = c.x + Math.cos(c.a) * c.spore * c.l, sy = c.y + Math.sin(c.a) * c.spore * c.l;
       ctx.beginPath(); ctx.ellipse(sx, sy, 0.48, 0.3, c.a, 0, Math.PI * 2);
@@ -1476,7 +1629,18 @@ function drawCell(ctx, c, sp, s) {
   }
 }
 function drawDebris(ctx, d) {
-  if (d.t === "nucleus") {
+  if (d.t === "pmn") {
+    // a neutrophil after safranin: faint granular pink cytoplasm, a nucleus of 3–5 lobes joined by thin strands
+    const R = makeRng(d.seed, "pmn");
+    ctx.beginPath();
+    for (let i = 0; i <= 12; i++) { const a = (i / 12) * Math.PI * 2, rr = d.r * (i === 12 ? 1 : R.range(0.93, 1.05)); const x = d.x + Math.cos(a) * rr, y = d.y + Math.sin(a) * rr; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.closePath(); ctx.fillStyle = "rgba(232,172,194,0.34)"; ctx.fill();
+    ctx.fillStyle = "rgba(200,110,150,0.28)";
+    for (let i = 0; i < 26; i++) { const [gx, gy] = R.inDisk(d.r * 0.9); ctx.beginPath(); ctx.arc(d.x + gx, d.y + gy, 0.14, 0, Math.PI * 2); ctx.fill(); }
+    ctx.strokeStyle = "rgba(150,36,84,0.7)"; ctx.lineWidth = 0.32; ctx.lineCap = "round";
+    ctx.beginPath(); d.lobes.forEach((l, i) => (i ? ctx.lineTo(l.x, l.y) : ctx.moveTo(l.x, l.y))); ctx.stroke();
+    for (const l of d.lobes) { ctx.beginPath(); ctx.ellipse(l.x, l.y, l.rx, l.ry, l.a, 0, Math.PI * 2); ctx.fillStyle = "rgba(158,40,92,0.86)"; ctx.fill(); }
+  } else if (d.t === "nucleus") {
     ctx.fillStyle = "rgba(170,190,225,0.5)";
     ctx.beginPath(); ctx.arc(d.x, d.y, d.r * 1.7, 0, Math.PI * 2); ctx.fill();
     for (let i = 0; i < d.lobes; i++) {
@@ -1549,7 +1713,20 @@ function buildLayers(sp, o, usePlate) {
   layers.push(dust);
   return layers;
 }
+function buildPlateFluorLayers(sp, o) {
+  const P = plateImgs[sp.plate], k = o.mag <= 10 ? 0 : o.mag <= 40 ? 1 : 2, [wx, wy, ws] = sp.crops[k];
+  return ["dapi", "fitc", "tritc"].map(ch => {
+    const cv = newCanvas(), x = cv.getContext("2d");
+    x.fillStyle = "#000"; x.fillRect(0, 0, SIZE, SIZE);
+    x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high";
+    x.drawImage(P[ch], wx, wy, ws, ws, 0, 0, SIZE, SIZE);
+    x.globalCompositeOperation = "multiply"; x.fillStyle = rgba(CH[ch].rgb, 1); x.fillRect(0, 0, SIZE, SIZE);
+    x.globalCompositeOperation = "source-over";
+    return { ch, z: sp.chZ[ch], w: ch === "fitc" ? 1.15 : 1, canvas: cv };
+  });
+}
 function buildFluorLayers(sp, o) {
+  if (sp.plate && plateImgs[sp.plate]) return buildPlateFluorLayers(sp, o);
   const s = o.s, viewR = SIZE / 2 / s + 30, minW = 0.9 / s;
   const inView = (c) => (c.x * c.x + c.y * c.y) < (viewR + c.r) * (viewR + c.r);
   const mk = (ch, z, w) => ({ ch, z, w, canvas: newCanvas() });
@@ -1708,6 +1885,244 @@ function drawCrack(ctx) {
 }
 
 /* =====================================================================
+   PARFOCAL · "Coverslip Lounge", an original generative jazz loop.
+   Written for Parfocal: electric piano, bass, brushes, vibes and a pad,
+   all synthesised live in WebAudio. No samples, no borrowed melodies.
+   Form: 16 bars in D dorian. Bars 1–8 are the groove, bars 9–16 add the
+   vibraphone tune and a string pad. A bVI–V turnaround closes each half.
+   ===================================================================== */
+const MUSIC = (() => {
+  const BPM = 94, STEP = 60 / BPM / 4, SWING = 0.17;          // 16th notes, lightly swung
+  const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+
+  // Rootless voicings around middle C; roots for the bass. q picks the bass's colour tone.
+  const CHORDS = [
+    { name: "Dm9",       root: 38, q: "m",   rh: [53, 57, 60, 64] },
+    { name: "G13",       root: 43, q: "dom", rh: [53, 57, 59, 64] },
+    { name: "Bbmaj9",    root: 46, q: "maj", rh: [57, 60, 62, 65] },
+    { name: "A7b9",      root: 45, q: "dom", rh: [55, 58, 61, 64] },
+    { name: "Dm9",       root: 38, q: "m",   rh: [53, 57, 60, 64] },
+    { name: "G13",       root: 43, q: "dom", rh: [53, 57, 59, 64] },
+    { name: "Ebmaj7#11", root: 39, q: "maj", rh: [55, 57, 58, 62] },
+    { name: "A9sus",     root: 45, q: "dom", rh: [55, 59, 62, 64], late: [55, 58, 61, 65] },
+  ];
+  // The tune: [bar, step, length in steps, midi]
+  const MELODY = [
+    [0, 2, 2, 69], [0, 4, 2, 72], [0, 6, 4, 76], [0, 11, 2, 74], [0, 13, 3, 72],
+    [1, 0, 4, 69], [1, 6, 2, 71], [1, 8, 2, 74], [1, 10, 6, 76],
+    [2, 2, 2, 77], [2, 4, 2, 76], [2, 6, 2, 74], [2, 8, 6, 72],
+    [3, 2, 2, 70], [3, 4, 2, 73], [3, 6, 2, 76], [3, 8, 4, 79], [3, 12, 4, 77],
+    [4, 0, 6, 76], [4, 7, 1, 74], [4, 8, 2, 72], [4, 10, 6, 69],
+    [5, 2, 2, 71], [5, 4, 2, 74], [5, 6, 2, 77], [5, 8, 8, 76],
+    [6, 2, 2, 74], [6, 4, 2, 70], [6, 6, 2, 67], [6, 8, 6, 69],
+    [7, 0, 2, 67], [7, 2, 2, 69], [7, 4, 4, 76], [7, 8, 2, 74], [7, 10, 6, 73],
+  ];
+  // Bass figures: [step, interval from root ("app" = chromatic approach to the next root), steps, velocity]
+  const BASS = [
+    [[0, 0, 3, 1], [3, 12, 1, .7], [6, 7, 2, .85], [8, 0, 2, .9], [10, "7th", 1, .7], [11, 12, 2, .8], [14, "app", 2, .8]],
+    [[0, 0, 2, 1], [2, 0, 1, .55], [4, 7, 2, .8], [7, 12, 2, .85], [10, 7, 1, .7], [12, 5, 2, .75], [14, "app", 2, .8]],
+  ];
+  // Electric-piano comping: [step, steps, velocity]; odd bars push the next chord in on step 14.
+  const COMP = [[[0, 5, .8], [6, 2, .55], [10, 3, .65]], [[2, 3, .7], [7, 2, .5], [10, 3, .7]]];
+
+  let A = null, out = null, bus = {}, timer = null, playing = false, step = 0, nextT = 0, enabled = false, scene = "menu";
+  let duckUntil = 0;
+
+  function graph(ctx) {
+    if (out && A === ctx) return;
+    A = ctx; bus = {};
+    out = A.createGain(); out.gain.value = 0;
+    const room = A.createBiquadFilter(); room.type = "lowpass"; room.frequency.value = 16000; room.Q.value = 0.5;
+    const comp = A.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 3; comp.attack.value = 0.01; comp.release.value = 0.25;
+    out.connect(room).connect(comp).connect(A.destination);
+    bus.room = room;
+    // a small synthetic hall
+    const ir = A.createBuffer(2, Math.floor(A.sampleRate * 2.4), A.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < d.length; i++) { const t = i / A.sampleRate; d[i] = (Math.random() * 2 - 1) * Math.exp(-t / 0.55) * (t < 0.012 ? t / 0.012 : 1); } }
+    const verb = A.createConvolver(); verb.buffer = ir;
+    const verbOut = A.createGain(); verbOut.gain.value = 0.32; verb.connect(verbOut).connect(out);
+    bus.verb = verb;
+    const mk = (g, send) => { const n = A.createGain(); n.gain.value = g; n.connect(out); if (send) { const s = A.createGain(); s.gain.value = send; n.connect(s).connect(verb); } return n; };
+    // electric piano through a slow auto-pan, like a suitcase Rhodes
+    const pan = A.createStereoPanner ? A.createStereoPanner() : null;
+    bus.keys = mk(1.05, 0.22);
+    if (pan) {
+      const lfo = A.createOscillator(), depth = A.createGain(); lfo.frequency.value = 3.1; depth.gain.value = 0.32;
+      lfo.connect(depth).connect(pan.pan); lfo.start();
+      bus.keysIn = A.createGain(); bus.keysIn.connect(pan).connect(bus.keys);
+    } else bus.keysIn = bus.keys;
+    bus.bass = mk(0.7, 0);
+    bus.drums = mk(0.8, 0.12);
+    bus.vibes = mk(1.15, 0.4);
+    bus.pad = mk(0.55, 0.5);
+  }
+
+  /* ---------- voices ---------- */
+  function keys(t, midi, dur, vel) {
+    const f = mtof(midi);
+    const car = A.createOscillator(); car.frequency.value = f;
+    const mod = A.createOscillator(); mod.frequency.value = f;
+    const mg = A.createGain(); mg.gain.setValueAtTime(f * 2.0 * vel, t); mg.gain.exponentialRampToValueAtTime(f * 0.22, t + 0.5);
+    const tine = A.createOscillator(); tine.frequency.value = f * 14;
+    const tg = A.createGain(); tg.gain.setValueAtTime(f * 1.1 * vel, t); tg.gain.exponentialRampToValueAtTime(0.5, t + 0.07);
+    mod.connect(mg).connect(car.frequency); tine.connect(tg).connect(car.frequency);
+    const g = A.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.11 * vel, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.045 * vel, t + 0.7); g.gain.setTargetAtTime(0.0001, t + dur, 0.11);
+    car.connect(g).connect(bus.keysIn);
+    const end = t + dur + 0.9;
+    [car, mod, tine].forEach(o => { o.start(t); o.stop(end); });
+  }
+  function bass(t, midi, dur, vel) {
+    const f = mtof(midi);
+    const o = A.createOscillator(); o.type = "triangle"; o.frequency.value = f;
+    const s = A.createOscillator(); s.type = "sawtooth"; s.frequency.value = f;
+    const sg = A.createGain(); sg.gain.value = 0.25;
+    const lp = A.createBiquadFilter(); lp.type = "lowpass"; lp.Q.value = 1.6;
+    lp.frequency.setValueAtTime(1200, t); lp.frequency.exponentialRampToValueAtTime(380, t + 0.22);
+    const g = A.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.34 * vel, t + 0.007);
+    g.gain.exponentialRampToValueAtTime(0.17 * vel, t + 0.2); g.gain.setTargetAtTime(0.0001, t + dur * 0.9, 0.03);
+    o.connect(lp); s.connect(sg).connect(lp); lp.connect(g).connect(bus.bass);
+    [o, s].forEach(x => { x.start(t); x.stop(t + dur + 0.25); });
+  }
+  function hiss(t, dur, type, f, q, g0, attack = 0.002) {
+    const n = A.createBufferSource(); n.buffer = noise(Math.max(0.05, dur));
+    const fl = A.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q;
+    const g = A.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(g0, t + attack); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    n.connect(fl).connect(g).connect(bus.drums); n.start(t); n.stop(t + dur + 0.02);
+  }
+  function kick(t, vel) {
+    const o = A.createOscillator(); o.frequency.setValueAtTime(115, t); o.frequency.exponentialRampToValueAtTime(46, t + 0.11);
+    const g = A.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.38 * vel, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+    o.connect(g).connect(bus.drums); o.start(t); o.stop(t + 0.32);
+  }
+  const brush = (t, vel) => { hiss(t, 0.24, "bandpass", 2500, 0.6, 0.2 * vel, 0.014); hiss(t, 0.1, "highpass", 5200, 0.7, 0.05 * vel); };
+  const hat = (t, vel, open) => hiss(t, open ? 0.24 : 0.04, "highpass", 7600, 0.8, 0.09 * vel);
+  function vibes(t, midi, dur, vel) {
+    const f = mtof(midi), end = t + dur + 1.4;
+    const g = A.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.13 * vel, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, end);
+    const trem = A.createGain(); trem.gain.value = 0.8;
+    const lfo = A.createOscillator(), ld = A.createGain(); lfo.frequency.value = 5.4; ld.gain.value = 0.22; lfo.connect(ld).connect(trem.gain);
+    [[1, 1, 0], [3.98, 0.32, 0.25], [9.9, 0.06, 0.08]].forEach(([r, a, dec]) => {
+      const o = A.createOscillator(); o.frequency.value = f * r;
+      const og = A.createGain(); og.gain.setValueAtTime(a, t); if (dec) og.gain.exponentialRampToValueAtTime(0.0001, t + dec);
+      o.connect(og).connect(g); o.start(t); o.stop(end);
+    });
+    g.connect(trem).connect(bus.vibes); lfo.start(t); lfo.stop(end);
+  }
+  function pad(t, notes, dur) {
+    const lp = A.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1300; lp.Q.value = 0.4;
+    const g = A.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.022, t + 0.6); g.gain.setTargetAtTime(0.0001, t + dur, 0.35);
+    lp.connect(g).connect(bus.pad);
+    notes.forEach(m => [-7, 7].forEach(c => { const o = A.createOscillator(); o.type = "sawtooth"; o.frequency.value = mtof(m + 12); o.detune.value = c; o.connect(lp); o.start(t); o.stop(t + dur + 1.6); }));
+  }
+
+  /* ---------- sequencer ---------- */
+  function scheduleStep(n, t) {
+    const bar = Math.floor(n / 16), s = n % 16, b8 = bar % 8, half = Math.floor(bar / 8) % 2;
+    const ch = CHORDS[b8], next = CHORDS[(b8 + 1) % 8], intro = bar < 2;
+    const dur = (k) => k * STEP;
+    // electric piano: odd bars push the next chord in early, so even bars skip their downbeat
+    const pushed = b8 % 2 === 1;
+    for (const [st, len, v] of COMP[b8 % 2]) {
+      if (st !== s) continue;
+      const voicing = b8 === 7 && st >= 8 && ch.late ? ch.late : ch.rh;
+      voicing.forEach((m, i) => keys(t + i * 0.008, m, dur(len), v * (i === 0 ? 1 : 0.85)));
+    }
+    if (pushed && s === 14) next.rh.forEach((m, i) => keys(t + i * 0.008, m, dur(5), 0.72));
+    if (!pushed && s === 0 && bar > 0 && b8 !== 0) { /* the push already played this downbeat */ }
+    if (intro) { if (s % 4 === 2) hat(t, 0.35, false); return; }
+    // bass
+    const fig = BASS[b8 % 4 === 3 ? 1 : 0];
+    for (const [st, iv, len, v] of fig) {
+      if (st !== s) continue;
+      let m;
+      if (iv === "app") m = next.root + (b8 % 2 ? 1 : -1);
+      else if (iv === "7th") m = ch.root + (ch.q === "maj" ? 9 : 10);
+      else m = ch.root + iv;
+      bass(t, m, dur(len), v);
+    }
+    // drums: kick and brushed backbeat, swung hats, a fill into each new half
+    if (s === 0 || s === 10 || (s === 7 && bar % 2)) kick(t, s === 7 ? 0.45 : 0.9);
+    if (s === 4 || s === 12) brush(t, 0.9);
+    if ((s === 9 || s === 15) && bar % 2 === 0) brush(t, 0.28);
+    if (b8 === 7 && s >= 12) brush(t, 0.35 + (s - 12) * 0.15);
+    if (s % 2 === 0) hat(t, s % 4 === 0 ? 0.55 : 0.7, s === 14 && bar % 2 === 1);
+    else hat(t, 0.2, false);
+    // second half: the tune and a pad
+    if (half === 1) {
+      for (const [mb, st, len, m] of MELODY) if (mb === b8 && st === s) vibes(t, m, dur(len), 0.9);
+      if (s === 0) pad(t, ch.rh.slice(1), dur(15));
+    }
+  }
+  function tick() {
+    if (!A) return;
+    while (nextT < A.currentTime + 0.15) {
+      const swing = step % 2 ? SWING * STEP : 0;
+      try { scheduleStep(step, nextT + swing); } catch (e) {}
+      nextT += STEP; step++;
+    }
+  }
+  function sceneGain() { return scene === "game" ? 0.62 : 1; }
+  function applyScene(fast) {
+    if (!A || !out) return;
+    const now = A.currentTime, tc = fast ? 0.05 : 0.35;
+    bus.room.frequency.setTargetAtTime(scene === "game" ? 1500 : 16000, now, tc);
+    if (playing) out.gain.setTargetAtTime(VOL * sceneGain() * (now < duckUntil ? 0.35 : 1), now, tc);
+  }
+  const VOL = 0.5;
+  function start() {
+    if (playing) return;
+    try {
+      graph(ac());
+      if (A.state === "suspended") A.resume();
+      playing = true; step = 0; nextT = A.currentTime + 0.08;
+      out.gain.cancelScheduledValues(A.currentTime);
+      out.gain.setValueAtTime(0.0001, A.currentTime);
+      out.gain.setTargetAtTime(VOL * sceneGain(), A.currentTime, 0.6);
+      applyScene(true);
+      clearInterval(timer); timer = setInterval(tick, 25); tick();
+    } catch (e) { playing = false; }
+  }
+  function stop() {
+    if (!playing) return;
+    playing = false;
+    try { out.gain.cancelScheduledValues(A.currentTime); out.gain.setTargetAtTime(0.0001, A.currentTime, 0.2); } catch (e) {}
+    clearInterval(timer); timer = null;
+  }
+  return {
+    setEnabled(on) { enabled = on; if (on && !document.hidden) start(); else stop(); },
+    get enabled() { return enabled; },
+    get playing() { return playing; },
+    setScene(sc) { scene = sc; applyScene(false); },
+    duck(secs = 1.6) {
+      if (!playing || !A) return;
+      const now = A.currentTime; duckUntil = now + secs;
+      out.gain.setTargetAtTime(VOL * sceneGain() * 0.3, now, 0.04);
+      out.gain.setTargetAtTime(VOL * sceneGain(), now + secs, 0.5);
+    },
+    pause() { stop(); },
+    // render a stretch of the loop without the speakers, for level checks in tests
+    async renderOffline(sec = 24) {
+      if (playing) stop();
+      const keep = { A, out, bus };
+      const OC = new OfflineAudioContext(2, Math.floor(44100 * sec), 44100);
+      graph(OC); out.gain.value = VOL;
+      let t = 0.05;
+      for (let n = 0; t < sec - 1.5; n++) { scheduleStep(n, t + (n % 2 ? SWING * STEP : 0)); t += STEP; }
+      const buf = await OC.startRendering();
+      A = keep.A; out = keep.out; bus = keep.bus;
+      return buf;
+    },
+    resume() { if (enabled) start(); },
+  };
+})();
+
+/* =====================================================================
    PARFOCAL · interface, motion and game flow
    ===================================================================== */
 const SITE_URL = "https://parfocal.vercel.app";
@@ -1720,7 +2135,7 @@ function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;
 const thetaOf = (o) => deg(Math.asin(Math.min(0.999, o.NA / o.n)));
 
 /* ---------- Sound vocabulary ---------- */
-let audioCtx = null, soundOn = loadStore().sound !== false;
+let audioCtx = null, soundOn = loadStore().sound !== false, musicOn = loadStore().music !== false;
 function ac() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === "suspended") audioCtx.resume(); return audioCtx; }
 const noiseCache = {};
 function noise(len) {
@@ -1801,6 +2216,8 @@ function show(v) {
   for (const k in screens) { screens[k].hidden = k !== v; screens[k].classList.remove("enter"); }
   void screens[v].offsetWidth; screens[v].classList.add("enter");
   current = v;
+  document.body.dataset.screen = v;
+  MUSIC.setScene(v === "game" && !pauseOpen ? "game" : "menu");
   root.dataset.mode = v === "title" ? homeMode : (G ? G.mode : homeMode);
   window.scrollTo(0, 0);
 }
@@ -1876,7 +2293,8 @@ function makeMenu(nav, { onSelect = () => {}, onActivate = () => {} } = {}) {
     items.forEach((it, j) => { it.classList.toggle("is-sel", j === i); it.tabIndex = j === i ? 0 : -1; });
     m.place();
     if (focus) items[i].focus({ preventScroll: true });
-    if (!silent && !m.quiet) { sfx("move", { i }); buzz(3); }
+    const now = performance.now();
+    if (!silent && !m.quiet && now - (m.lastSnd || 0) > 45) { m.lastSnd = now; sfx("move", { i }); buzz(3); }
     onSelect(items[i], i);
   };
   m.step = (dir) => {
@@ -1893,8 +2311,17 @@ function makeMenu(nav, { onSelect = () => {}, onActivate = () => {} } = {}) {
   };
   m.enter = () => { nav.classList.remove("m-leave"); nav.classList.remove("m-enter"); void nav.offsetWidth; nav.classList.add("m-enter"); setTimeout(m.place, 40); };
   m.leave = () => { nav.classList.remove("m-enter"); nav.classList.add("m-leave"); };
+  // Hover selects only on real pointer movement. When a selection changes the layout, the browser
+  // re-runs hover under a cursor that hasn't moved; acting on that would bounce between two items.
+  nav.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse") return;
+    const moved = !m.pt || Math.abs(e.clientX - m.pt[0]) + Math.abs(e.clientY - m.pt[1]) >= 1;
+    m.pt = [e.clientX, e.clientY];
+    if (!moved) return;
+    const it = e.target.closest && e.target.closest(".m-item"), i = items.indexOf(it);
+    if (i >= 0 && usable(i)) m.select(i);
+  });
   items.forEach((it, i) => {
-    it.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && usable(i)) m.select(i); });
     it.addEventListener("pointerdown", () => { if (usable(i)) m.select(i); });
     it.addEventListener("focus", () => { if (usable(i)) m.select(i); });
     it.addEventListener("click", () => { m.select(i, { silent: true }); m.activate(i); });
@@ -1980,10 +2407,29 @@ function syncChips() {
   $("clockChip").setAttribute("aria-pressed", String(timedMode)); $("clockVal").textContent = timedMode ? "Timed" : "Timeless";
   $("soundChip").setAttribute("aria-pressed", String(soundOn)); $("soundVal").textContent = soundOn ? "On" : "Off";
   $("pauseSound").textContent = soundOn ? "Sound on" : "Sound off";
+  const mOn = musicOn && soundOn;
+  $("musicBtn").setAttribute("aria-pressed", String(mOn)); $("musicBtn").classList.toggle("live", MUSIC.playing);
+  $("musicBtn").setAttribute("aria-label", mOn ? "Music on. Turn off" : "Music off. Turn on");
+  $("pauseMusic").textContent = mOn ? "Music on" : "Music off";
 }
 function flipChip(id) { const c = $(id); c.classList.remove("flip"); void c.offsetWidth; c.classList.add("flip"); }
 function toggleClock() { timedMode = !timedMode; patchStore({ timed: timedMode }); syncChips(); flipChip("clockChip"); sfx("move", { i: timedMode ? 4 : 1 }); const s = titleMenu.items[titleMenu.sel]; if (s) $("titleCaption").textContent = captionFor(s.dataset.act); }
-function toggleSound() { soundOn = !soundOn; patchStore({ sound: soundOn }); syncChips(); flipChip("soundChip"); if (soundOn) sfx("confirm"); }
+function toggleSound() { soundOn = !soundOn; patchStore({ sound: soundOn }); MUSIC.setEnabled(musicOn && soundOn); syncChips(); flipChip("soundChip"); if (soundOn) sfx("confirm"); }
+function toggleMusic() {
+  // the first press after load only unlocks audio if music was already meant to be on
+  if (musicOn && soundOn && !MUSIC.playing) { MUSIC.setEnabled(true); syncChips(); return; }
+  musicOn = !(musicOn && soundOn);
+  if (musicOn && !soundOn) { soundOn = true; patchStore({ sound: true }); }
+  patchStore({ music: musicOn }); MUSIC.setEnabled(musicOn && soundOn); syncChips(); sfx(musicOn ? "confirm" : "back");
+}
+$("musicBtn").addEventListener("click", toggleMusic);
+// Browsers only allow audio after a gesture: start the music on the first one.
+function firstGesture(e) {
+  window.removeEventListener("pointerdown", firstGesture, true); window.removeEventListener("keydown", firstGesture, true);
+  if (e && e.target && e.target.closest && e.target.closest("#musicBtn")) return;
+  if (musicOn && soundOn) { MUSIC.setEnabled(true); syncChips(); }
+}
+window.addEventListener("pointerdown", firstGesture, true); window.addEventListener("keydown", firstGesture, true);
 $("clockChip").addEventListener("click", toggleClock);
 $("soundChip").addEventListener("click", toggleSound);
 
@@ -2117,15 +2563,26 @@ function drawNaFig(o, th) {
   naAnim.raf = requestAnimationFrame(step);
 }
 function renderCredits() {
-  const loaded = ORGS.filter(o => plateImgs[o.id]);
-  let html = `<p>Brightfield slides show one of six organisms, drawn in code from published cell size, shape, arrangement and stain colour: ${ORGS.map(o => `<i>${o.name}</i>`).join(", ")}.</p>
-    <p>Fluorescence slides are cultured cells with DNA, tubulin and actin labels. Confocal slides are epithelial organoids with nuclear, membrane and lysosome labels.</p>`;
-  if (loaded.length) {
-    html += `<p>Photographic plates used at 100x:</p><ul>` + loaded.map(o => `<li>${escapeHtml(PLATES[o.id].credit)} <a href="${PLATES[o.id].url}" target="_blank" rel="noopener">Source</a></li>`).join("") + `</ul>`;
-    if (loaded.some(o => /BY-SA/.test(PLATES[o.id].credit))) html += `<p>Modified CC BY-SA plates are shared under the same licence.</p>`;
+  const photos = Object.keys(PLATES).filter(id => plateImgs[id]);
+  const withPhoto = ORGS.filter(o => plateImgs[o.id]).length;
+  let html = `<h3>Slides</h3>
+    <p>Brightfield slides show one of ${ORGS.length} organisms, drawn in code from published cell size, shape, arrangement and stain colour: ${ORGS.map(o => `<i>${o.name}</i>`).join(", ")}.${withPhoto ? ` For ${withPhoto} of them, the 100x view is a real micrograph.` : ""}</p>
+    <p>Fluorescence slides are either drawn cultured cells with DNA, tubulin and actin labels, or a real three-channel field of HT29 cells. Confocal slides are drawn epithelial organoids with nuclear, membrane and lysosome labels.</p>`;
+  if (photos.length) {
+    html += `<p>Photographs:</p><ul>` + photos.map(id => `<li>${escapeHtml(PLATES[id].credit)} <a href="${PLATES[id].url}" target="_blank" rel="noopener">Source</a></li>`).join("") + `</ul>`;
+    if (photos.some(id => /BY-SA/.test(PLATES[id].credit))) html += `<p>The modified CC BY-SA photographs are shared under the same licence.</p>`;
   }
-  html += `<p>Type: Archivo, Hanken Grotesk and DM Mono, all from Google Fonts under the SIL Open Font License.</p>
-    <p>Designed and built by Destiny. Source on <a href="https://github.com/DimmedLights" target="_blank" rel="noopener">GitHub</a>.</p>`;
+  html += `<h3>Inspiration</h3>
+    <ul>
+      <li>The one-slide-a-day format comes from <a href="https://dialed.gg" target="_blank" rel="noopener">dialed.gg</a>.</li>
+      <li>The menus take their energy from <i>Persona 3 Reload</i> (Atlus): tilted type, a highlight that slides between choices, and screens that cut on a diagonal. The ideas are borrowed; no Atlus art, type or sound is used.</li>
+      <li>Writing on menu design and game feel from Mechanics of Magic, Siliconera and Game Developer, and kinetic type experiments on Codrops.</li>
+    </ul>
+    <h3>Music</h3>
+    <p>An original lounge-jazz loop, composed for Parfocal and played live by your browser: electric piano, bass, brushes and vibes. It nods to the acid-jazz feel of the Persona soundtracks without quoting them.</p>
+    <h3>Built with</h3>
+    <p>Designed by Destiny. Coded with Claude, Anthropic's AI model, as a collaborator.</p>
+    <p>Type: Archivo, Hanken Grotesk and DM Mono, from Google Fonts under the SIL Open Font License. Source on <a href="https://github.com/DimmedLights" target="_blank" rel="noopener">GitHub</a>.</p>`;
   $("creditsBody").innerHTML = html;
 }
 
@@ -2160,7 +2617,7 @@ function startGameNow({ daily, tut, seed: seedIn, mode }) {
   const sp = genSpecimen(seed, mode, org && org.id);
   const info = mode === "bright"
     ? { name: org.name, stain: org.stain, facts: [["Reaction", org.gram], ["Shape", org.shape], ["Arrangement", org.arr], ["Size", org.size]], why: org.why, plateId: org.id }
-    : SPEC_INFO[mode === "fluor" ? "hela" : "organoid"];
+    : SPEC_INFO[sp.info || (mode === "fluor" ? "hela" : "organoid")];
   const p40 = (S.chance(0.5) ? 1 : -1) * S.range(0.7, 2.0);
   const p100 = p40 + (S.chance(0.5) ? 1 : -1) * S.range(0.35, 1.0);
   const startZ = tut ? -900 : -S.range(1200, 2200);
@@ -2642,7 +3099,7 @@ function victoryTune() {
     note(130.81, t0 + 0.64, 0.5, "triangle", 1.2);
   } catch (e) {}
 }
-function celebrate() { fireConfetti(); popSound(); setTimeout(victoryTune, 120); buzz([30, 40, 60]); }
+function celebrate() { fireConfetti(); popSound(); MUSIC.duck(2.4); setTimeout(victoryTune, 120); buzz([30, 40, 60]); }
 function countUp(el, to, dur, onDone) {
   const t0 = performance.now(); let lastTick = 0;
   if (prefersReduced() || to === 0) { el.textContent = to; onDone && onDone(); return; }
@@ -2682,7 +3139,7 @@ async function toVerdict(v) {
   // the slam
   $("slamEyebrow").textContent = v.title; $("slamTier").textContent = v.tier; $("slamScore").textContent = "0";
   if (!prefersReduced()) {
-    slam.hidden = false; slam.className = "slam go"; sfx("slam"); buzz(20);
+    slam.hidden = false; slam.className = "slam go"; sfx("slam"); MUSIC.duck(1.4); buzz(20);
     let skipped = false; const skip = new Promise(r => { slamSkip = () => { skipped = true; r(); }; });
     countUp($("slamScore"), v.score, 650, () => { if (v.score >= WIN) celebrate(); else sfx("lose"); });
     play(dock, "slide-out"); setTimeout(() => play(scope, "slide-out"), 80);
@@ -2806,7 +3263,8 @@ function pauseCtx(act) {
     controls: touch
       ? `<h3>Controls</h3><dl><dt>Coarse</dt><dd>Drag the Coarse strip. Fast drags travel further.</dd><dt>Fine</dt><dd>Drag the Fine strip, 0.25 µm a tick.</dd><dt>Lock</dt><dd>Lock focus button</dd><dt>Oil</dt><dd>Add oil button, at 100x</dd></dl>`
       : `<h3>Controls</h3><dl><dt>Coarse</dt><dd>Outer ring, Shift + ↑ ↓, or PgUp PgDn. Fast spins travel further.</dd><dt>Fine</dt><dd>Centre of the knob, or ↑ ↓</dd><dt>Lock</dt><dd>Enter</dd><dt>Oil</dt><dd>O, at 100x</dd>${G.mode === "fluor" ? "<dt>Cube</dt><dd>C · shutter S</dd>" : ""}${G.mode === "confocal" ? "<dt>Pinhole</dt><dd>P</dd>" : ""}<dt>Menu</dt><dd>Esc</dd></dl>`,
-    sound: `<h3>Sound</h3><p>Knob clicks, menu sounds and the victory tune. Currently ${soundOn ? "on" : "off"}.</p>`,
+    sound: `<h3>Sound</h3><p>Knob clicks, menu sounds and the victory tune. Turning sound off also silences the music. Currently ${soundOn ? "on" : "off"}.</p>`,
+    music: `<h3>Music</h3><p>An original lounge-jazz loop played live by your browser. It turns down while you focus and opens up in the menus. Currently ${musicOn && soundOn ? "on" : "off"}. Shortcut: B.</p>`,
     quit: `<h3>Quit to title</h3><p>You'll leave this slide. ${G.daily ? "Daily slides can be replayed any time today." : "Practice slides are random, so this one won't come back."}</p>`,
   }[act] || "";
   c.innerHTML = html; c.classList.remove("swap"); void c.offsetWidth; c.classList.add("swap");
@@ -2819,6 +3277,7 @@ const pauseMenu = makeMenu($("pauseMenu"), {
     else if (act === "restart") { closePause(true); TUT.stop(); startGame({ daily: G.daily, tut: G.tut, seed: G.seed, mode: G.mode }); }
     else if (act === "controls") pauseCtx("controls");
     else if (act === "sound") { toggleSound(); pauseCtx("sound"); }
+    else if (act === "music") { toggleMusic(); pauseCtx("music"); }
     else if (act === "quit") { closePause(true); quitToTitle(); }
   },
 });
@@ -2826,7 +3285,7 @@ function openPause() {
   if (!G || pauseOpen || busy || current !== "game") return;
   pauseOpen = true; G.paused = true; G.pausedAt = performance.now();
   const p = $("pause"); p.hidden = false; p.classList.remove("closing"); p.classList.add("open");
-  sfx("pause"); sfx("whoosh");
+  sfx("pause"); sfx("whoosh"); MUSIC.setScene("menu");
   pauseMenu.quiet = true; pauseMenu.select(0, { focus: true }); pauseMenu.quiet = false;
   pauseCtx("resume");
   pauseMenu.enter();
@@ -2836,7 +3295,7 @@ async function closePause(instant) {
   pauseOpen = false;
   const p = $("pause");
   if (G) { const dtp = performance.now() - G.pausedAt; G.t0 += dtp; G.lastT = performance.now(); G.paused = false; G.dirty = true; }
-  sfx("back");
+  sfx("back"); if (current === "game") MUSIC.setScene("game");
   if (instant || prefersReduced()) { p.hidden = true; p.classList.remove("open"); return; }
   pauseMenu.leave(); p.classList.remove("open"); p.classList.add("closing");
   await wait(420); p.hidden = true; p.classList.remove("closing");
@@ -2886,7 +3345,7 @@ function finishNow() {
   if (!uniq.length) uniq.push(G.mode === "fluor" ? "Clean technique: right cube for each label, shutter closed while thinking, oil before 100x." : G.mode === "confocal" ? "Clean technique: coarse only at 10x, a tight pinhole, and oil before 63x." : "Clean technique: coarse only at 10x, fine focus above it, oil before 100x.");
   uniq.forEach(t => { const li = document.createElement("li"); li.textContent = t; ls.appendChild(li); });
   const plate = info.plateId && plateImgs[info.plateId] ? PLATES[info.plateId] : null;
-  $("rCredit").innerHTML = plate ? `100x plate: ${escapeHtml(plate.credit)} <a href="${plate.url}" target="_blank" rel="noopener">Source</a>` : "Specimen drawn in code from published size, shape and labelling.";
+  $("rCredit").innerHTML = plate ? `${G.mode === "bright" ? "100x plate" : "Photograph"}: ${escapeHtml(plate.credit)} <a href="${plate.url}" target="_blank" rel="noopener">Source</a>` : "Specimen drawn in code from published size, shape and labelling.";
   $("shareText").textContent = shareMessage().replace(/\n/g, " · ");
   $("copyBtn").textContent = "Copy result";
   $("rActions").classList.remove("fan");
@@ -2981,56 +3440,84 @@ async function drawCard() {
   try { await document.fonts.ready; } catch (e) {}
   const cv = document.createElement("canvas"); cv.width = CARD_W; cv.height = CARD_H;
   const c = cv.getContext("2d");
-  const f = G.final, win = f.total >= 1800, [acc, acc2] = CARD_ACC[G.mode];
-  const DISP = '"Archivo", "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif', MONO = '"DM Mono", ui-monospace, Menlo, monospace';
-  const cream = "#f3ece0", muted = "#a39888";
-  c.fillStyle = "#15110f"; c.fillRect(0, 0, CARD_W, CARD_H);
-  c.save(); c.translate(CARD_W / 2, 0); c.rotate(-7 * Math.PI / 180); c.fillStyle = acc; c.globalAlpha = 0.16; c.fillRect(-900, 760, 1800, 300); c.restore();
-  let g = c.createRadialGradient(900, 120, 0, 900, 120, 760); g.addColorStop(0, "rgba(120,86,50,0.45)"); g.addColorStop(1, "rgba(120,86,50,0)");
+  const f = G.final, [acc, acc2] = CARD_ACC[G.mode];
+  const DISP = '"Archivo", "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif', MONO = '"DM Mono", ui-monospace, Menlo, monospace', BODY = '"Hanken Grotesk", "Helvetica Neue", Arial, sans-serif';
+  const cream = "#f3ece0", muted = "#a39888", ink = "#15110f", M = 84; // outer margin inside the frame
+  const rad = (d) => d * Math.PI / 180;
+  // ground: warm black, a glow behind the eyepiece, a faint outline word
+  c.fillStyle = ink; c.fillRect(0, 0, CARD_W, CARD_H);
+  let g = c.createRadialGradient(400, 470, 40, 400, 470, 620); g.addColorStop(0, "rgba(120,86,50,0.42)"); g.addColorStop(1, "rgba(120,86,50,0)");
   c.fillStyle = g; c.fillRect(0, 0, CARD_W, CARD_H);
+  g = c.createRadialGradient(CARD_W, 0, 0, CARD_W, 0, 700); g.addColorStop(0, acc + "33"); g.addColorStop(1, acc + "00");
+  c.fillStyle = g; c.fillRect(0, 0, CARD_W, CARD_H);
+  c.save(); c.translate(CARD_W / 2, 700); c.rotate(rad(-6)); c.font = `italic 900 260px ${DISP}`; c.textAlign = "center";
+  c.strokeStyle = "rgba(255,240,220,0.06)"; c.lineWidth = 2; c.strokeText(MODES[G.mode].name.toUpperCase(), 0, 90); c.restore();
   c.strokeStyle = "rgba(255,240,220,0.14)"; c.lineWidth = 2; rr(c, 36, 36, CARD_W - 72, CARD_H - 72, 44); c.stroke();
-  c.textBaseline = "alphabetic";
-  c.fillStyle = cream; c.font = `italic 900 50px ${DISP}`; c.fillText("PARFOCAL", 84, 132);
-  c.font = `400 26px ${MONO}`; c.fillStyle = muted; c.textAlign = "right";
-  c.fillText(G.daily ? `DAILY · ${G.key}` : "PRACTICE SLIDE", CARD_W - 84, 108);
-  c.fillText(`${MODES[G.mode].name.toUpperCase()} · ${G.timed ? "TIMED" : "TIMELESS"}`, CARD_W - 84, 142);
+  // header
+  c.textBaseline = "alphabetic"; c.textAlign = "left";
+  c.fillStyle = cream; c.font = `italic 900 52px ${DISP}`; c.fillText("PARFOCAL", M, 140);
+  c.fillStyle = acc; c.beginPath(); c.arc(M + c.measureText("PARFOCAL").width + 22, 122, 8, 0, Math.PI * 2); c.fill();
+  c.font = `500 24px ${MONO}`; c.fillStyle = muted; c.textAlign = "right";
+  c.fillText(G.daily ? `DAILY · ${G.key}` : "PRACTICE SLIDE", CARD_W - M, 112);
+  c.fillText(`${MODES[G.mode].name.toUpperCase()} · ${G.timed ? "TIMED" : "TIMELESS"}`, CARD_W - M, 146);
   c.textAlign = "left";
-  const ex = CARD_W / 2 - 40, ey = 470, er = 260;
-  c.save(); c.shadowColor = "rgba(0,0,0,0.6)"; c.shadowBlur = 60; c.shadowOffsetY = 24;
-  c.beginPath(); c.arc(ex, ey, er + 34, 0, Math.PI * 2); c.fillStyle = "#0e0b09"; c.fill(); c.restore();
-  c.beginPath(); c.arc(ex, ey, er + 34, 0, Math.PI * 2); c.lineWidth = 3; c.strokeStyle = "#4a4038"; c.stroke();
-  for (let i = 0; i < 120; i++) { const a = i / 120 * Math.PI * 2, r0 = i % 10 ? er + 22 : er + 16; c.beginPath(); c.moveTo(ex + Math.cos(a) * r0, ey + Math.sin(a) * r0); c.lineTo(ex + Math.cos(a) * (er + 30), ey + Math.sin(a) * (er + 30)); c.strokeStyle = i % 10 ? "rgba(200,185,166,.35)" : "rgba(200,185,166,.8)"; c.lineWidth = i % 10 ? 1 : 2; c.stroke(); }
+  // eyepiece, showing the slide at the last objective
+  const ex = 400, ey = 440, er = 224;
+  c.save(); c.shadowColor = "rgba(0,0,0,0.65)"; c.shadowBlur = 60; c.shadowOffsetY = 26;
+  c.beginPath(); c.arc(ex, ey, er + 32, 0, Math.PI * 2); c.fillStyle = "#0e0b09"; c.fill(); c.restore();
+  c.beginPath(); c.arc(ex, ey, er + 32, 0, Math.PI * 2); c.lineWidth = 3; c.strokeStyle = "#4a4038"; c.stroke();
+  for (let i = 0; i < 120; i++) { const a = i / 120 * Math.PI * 2, r0 = i % 10 ? er + 20 : er + 13; c.beginPath(); c.moveTo(ex + Math.cos(a) * r0, ey + Math.sin(a) * r0); c.lineTo(ex + Math.cos(a) * (er + 28), ey + Math.sin(a) * (er + 28)); c.strokeStyle = i % 10 ? "rgba(200,185,166,.35)" : "rgba(200,185,166,.8)"; c.lineWidth = i % 10 ? 1 : 2; c.stroke(); }
   const field = newCanvas(), o2 = OBJ[2], t2 = G.sp.targets[2];
   renderField(field.getContext("2d"), G.sp, buildLayers(G.sp, o2, true), { o: o2, e: effective(G.mode, 2, true, 1), d: -t2.z, cube: "all", shutter: true, signal: 1 });
   c.save(); c.beginPath(); c.arc(ex, ey, er, 0, Math.PI * 2); c.clip(); c.drawImage(field, ex - er, ey - er, er * 2, er * 2); c.restore();
-  // rank plate
-  c.save(); c.translate(870, 640); c.rotate(-7 * Math.PI / 180); c.transform(1, 0, Math.tan(-14 * Math.PI / 180), 1, 0, 0);
-  c.fillStyle = acc2; rr(c, -96, -88, 180, 180, 26); c.fill();
-  c.fillStyle = acc; rr(c, -86, -98, 180, 180, 26); c.fill(); c.restore();
-  c.save(); c.translate(870, 640); c.rotate(-7 * Math.PI / 180);
-  c.fillStyle = "#15110f"; c.font = `italic 900 150px ${DISP}`; c.textAlign = "center"; c.fillText(f.rank, 4, 52); c.restore();
-  c.font = `500 22px ${MONO}`; c.fillStyle = muted; c.textAlign = "center"; c.fillText("RANK", 870, 770);
-  c.textAlign = "center";
-  c.save(); c.translate(CARD_W / 2, 905); c.rotate(-4 * Math.PI / 180);
-  c.fillStyle = acc; fitText(c, f.tier, CARD_W - 180, 96, "italic 900", DISP); c.fillText(f.tier, 0, 0); c.restore();
-  c.fillStyle = cream; const quip = `“${f.quip}”`; fitText(c, quip, CARD_W - 200, 32, "italic 500", DISP); c.fillText(quip, CARD_W / 2, 968);
-  c.font = `900 150px ${DISP}`; c.fillStyle = cream;
-  const big = String(f.total), bw = c.measureText(big).width;
-  c.font = `400 40px ${MONO}`; const sw = c.measureText(" / 3000").width;
-  const sx = CARD_W / 2 - (bw + sw) / 2;
-  c.textAlign = "left"; c.font = `900 150px ${DISP}`; c.fillText(big, sx, 1116);
-  c.font = `400 40px ${MONO}`; c.fillStyle = muted; c.fillText(" / 3000", sx + bw, 1116);
-  const bx = 150, bwid = CARD_W - 300, by = 1154;
+  // objective chip on the rim
+  const chip = `${o2.mag}X · NA ${o2.NA.toFixed(2)} · ${o2.n > 1 ? "OIL" : "DRY"}`;
+  c.font = `500 20px ${MONO}`; const cw = c.measureText(chip).width + 36;
+  rr(c, ex - cw / 2, ey + er + 32 - 20, cw, 40, 20); c.fillStyle = "#231d19"; c.fill(); c.strokeStyle = "rgba(255,240,220,0.18)"; c.lineWidth = 1.5; c.stroke();
+  c.fillStyle = cream; c.textAlign = "center"; c.fillText(chip, ex, ey + er + 32 + 7); c.textAlign = "left";
+  // rank plate, tilted like the in-game stamp
+  const rx = 846, ry = 372;
+  c.save(); c.translate(rx, ry); c.rotate(rad(-7)); c.transform(1, 0, Math.tan(rad(-12)), 1, 0, 0);
+  c.fillStyle = acc2; rr(c, -86, -78, 172, 172, 26); c.fill();
+  c.fillStyle = acc; rr(c, -76, -90, 172, 172, 26); c.fill(); c.restore();
+  c.save(); c.translate(rx, ry); c.rotate(rad(-7));
+  c.fillStyle = ink; c.font = `italic 900 148px ${DISP}`; c.textAlign = "center"; c.fillText(f.rank, 10, 48); c.restore();
+  c.textAlign = "center"; c.font = `500 20px ${MONO}`; c.fillStyle = muted; c.fillText("RANK", rx, 532);
+  c.font = `600 22px ${BODY}`; c.fillStyle = cream;
+  const best = G.results.reduce((m, r) => (r.score > m.score ? r : m), G.results[0]);
+  c.fillText(`Best: ${best.mag}x · ${best.crashed ? "crack" : best.score}`, rx, 566);
+  // tier band, the same slam the game uses
+  const bandY = 776;
+  c.save(); c.translate(CARD_W / 2, bandY); c.rotate(rad(-5));
+  c.fillStyle = acc2; c.fillRect(-720, -66 + 12, 1440, 132);
+  c.fillStyle = acc; c.fillRect(-720, -66, 1440, 132);
+  c.fillStyle = ink; c.textAlign = "center"; fitText(c, f.tier, CARD_W - 200, 92, "italic 900", DISP); c.fillText(f.tier, 0, 32);
+  c.restore();
+  // quip
+  c.fillStyle = cream; c.textAlign = "center"; const quip = `“${f.quip}”`;
+  fitText(c, quip, CARD_W - 2 * M - 40, 30, "italic 500", BODY); c.fillText(quip, CARD_W / 2, 940);
+  // score on the left, one bar per objective on the right
+  const scoreY = 1092;
+  c.textAlign = "left"; c.font = `900 148px ${DISP}`; c.fillStyle = cream;
+  const big = String(f.total), bw = c.measureText(big).width; c.fillText(big, M - 4, scoreY);
+  c.font = `400 30px ${MONO}`; c.fillStyle = muted; c.fillText("/ 3000", M + 2, scoreY + 42);
+  const colX = Math.max(M + bw + 56, 560), colW = CARD_W - M - colX, rowY0 = 1000;
   G.results.forEach((r, i) => {
-    const y = by + i * 40;
-    c.font = `400 24px ${MONO}`; c.fillStyle = muted; c.textAlign = "left"; c.fillText(`${r.mag}x`, bx, y + 18);
-    rr(c, bx + 80, y + 4, bwid - 200, 14, 4); c.fillStyle = "rgba(255,240,220,0.1)"; c.fill();
-    const w = Math.max(0, (bwid - 200) * r.score / 1000);
-    if (w > 0) { rr(c, bx + 80, y + 4, Math.max(14, w), 14, 4); c.fillStyle = acc; c.fill(); }
-    c.textAlign = "right"; c.fillStyle = cream; c.fillText(r.crashed ? "crack" : String(r.score), bx + bwid, y + 18);
+    const y = rowY0 + i * 50;
+    c.font = `500 22px ${MONO}`; c.fillStyle = muted; c.textAlign = "left"; c.fillText(`${r.mag}x`, colX, y + 8);
+    const bx = colX + 78, bwid = colW - 78 - 86;
+    rr(c, bx, y - 7, bwid, 16, 6); c.fillStyle = "rgba(255,240,220,0.1)"; c.fill();
+    const w = Math.max(0, bwid * r.score / 1000);
+    if (w > 0) { rr(c, bx, y - 7, Math.max(16, w), 16, 6); c.fillStyle = r.score >= 600 ? acc : "rgba(255,240,220,0.42)"; c.fill(); }
+    c.textAlign = "right"; c.fillStyle = r.crashed ? "#ef8b6b" : cream; c.font = `600 24px ${MONO}`; c.fillText(r.crashed ? "crack" : String(r.score), CARD_W - M, y + 9);
   });
-  c.textAlign = "left"; c.font = `${G.mode === "bright" ? "italic " : ""}600 26px ${DISP}`; c.fillStyle = cream; c.fillText(G.info.name, 84, CARD_H - 76);
-  c.font = `400 22px ${MONO}`; c.fillStyle = muted; c.textAlign = "right"; c.fillText(win ? "PARFOCAL.VERCEL.APP" : "TOMORROW, SHARPER", CARD_W - 84, CARD_H - 78);
+  // footer: specimen on the left, the address on the right, with a hairline above
+  const fy = CARD_H - 154;
+  c.strokeStyle = "rgba(255,240,220,0.14)"; c.lineWidth = 1.5; c.beginPath(); c.moveTo(M, fy); c.lineTo(CARD_W - M, fy); c.stroke();
+  c.textAlign = "left"; c.fillStyle = cream;
+  const spec = G.info.name; fitText(c, spec, CARD_W - 2 * M - 300, 28, `${G.mode === "bright" ? "italic " : ""}600`, BODY); c.fillText(spec, M, fy + 52);
+  c.font = `500 20px ${MONO}`; c.fillStyle = muted; c.textAlign = "right";
+  c.fillText("PARFOCAL.VERCEL.APP", CARD_W - M, fy + 50);
   c.textAlign = "left";
   return cv;
 }
@@ -3091,6 +3578,7 @@ document.addEventListener("keydown", (e) => {
     else if (k === "e" || e.key === "ArrowRight") { e.preventDefault(); cycleMode(1); }
     else if (k === "t") toggleClock();
     else if (k === "m") toggleSound();
+    else if (k === "b") toggleMusic();
     return;
   }
   if (current === "game" && G) {
@@ -3101,6 +3589,7 @@ document.addEventListener("keydown", (e) => {
     else if (e.key === "PageUp" || e.key === "PageDown") { e.preventDefault(); applyTicks("coarse", e.key === "PageUp" ? 1 : -1); }
     else if (e.key === "Enter" && tag !== "button") { e.preventDefault(); if (!G.locked && !G.crashed) lock(false); else if (gameGrid.classList.contains("judged")) $("nextBtn").click(); }
     else if (e.key === "o" || e.key === "O") addOil();
+    else if (e.key === "b" || e.key === "B") toggleMusic();
     else if ((e.key === "c" || e.key === "C") && G.mode === "fluor" && canAct()) { const order = ["dapi", "fitc", "tritc"]; G.cube = order[(order.indexOf(G.cube) + 1) % 3]; syncCube(); setStageUI(); sfx("fine"); }
     else if ((e.key === "s" || e.key === "S") && G.mode === "fluor" && canAct()) { G.shutter = !G.shutter; syncShutter(); sfx("coarse"); }
     else if ((e.key === "p" || e.key === "P") && G.mode === "confocal" && canAct()) { G.pinhole = G.pinhole === 1 ? 2 : 1; syncPinhole(); sfx("fine"); }
@@ -3108,7 +3597,22 @@ document.addEventListener("keydown", (e) => {
   }
   if (current === "result" && e.key === "Escape") { e.preventDefault(); quitToTitle(); }
 });
-document.addEventListener("visibilitychange", () => { if (document.hidden && current === "game" && G && G.ready && !G.locked && !pauseOpen) openPause(); });
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && current === "game" && G && G.ready && !G.locked && !pauseOpen) openPause();
+  if (document.hidden) MUSIC.pause(); else MUSIC.resume();
+  syncChips();
+});
+// Header: a hairline and glass once the page scrolls; the brand goes home
+const topbar = $("topbar");
+const onScroll = () => topbar.classList.toggle("scrolled", window.scrollY > 4);
+window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+$("brand").addEventListener("click", (e) => {
+  e.preventDefault();
+  if (busy || current === "title") return;
+  if (openPanelId) { closePanel(); return; }
+  if (current === "game") { if (pauseOpen) closePause(); else openPause(); return; }
+  sfx("back"); quitToTitle();
+});
 
 /* ---------- Main loop ---------- */
 function loop(now) {
@@ -3151,6 +3655,7 @@ function loop(now) {
 
 /* ---------- Boot ---------- */
 root.dataset.mode = homeMode;
+document.body.dataset.screen = "title";
 $("tWord").querySelector("span").textContent = MODE_WORD[homeMode];
 syncChips();
 buildHero();
@@ -3162,7 +3667,18 @@ renderNotes(); renderCredits();
 loadPlates(renderCredits);
 requestAnimationFrame(loop);
 /* test hook for local checks only: inert unless the page is opened with #pftest */
-if (location.hash === "#pftest") window.__pf = { get G() { return G; }, focusNow() { G.stageZ = G.p[G.k] - G.sp.targets[G.k].z; G.zv = G.stageZ; G.dirty = true; }, nudge(um) { G.stageZ += um; G.dirty = true; } };
+if (location.hash === "#pftest") window.__pf = { get G() { return G; }, get music() { return { playing: MUSIC.playing, enabled: MUSIC.enabled }; }, plates() { return Object.keys(plateImgs); },
+  renderSpec(mode, seed, k) { const m = MODES[mode], sp = genSpecimen(seed, mode, mode === "bright" ? ORGS[seed % ORGS.length].id : null), o = m.objs[k], cv = newCanvas(); renderField(cv.getContext("2d"), sp, buildLayers(sp, o, k === 2), { o, e: effective(mode, k, true, 1), d: -sp.targets[k].z, cube: "all", shutter: true, signal: 1 }); return { url: cv.toDataURL("image/jpeg", 0.85), kind: sp.plate || sp.orgId || sp.kind }; },
+  start(mode, seed) { startGame({ seed, mode }); },
+  async musicWav(sec) {
+    const b = await MUSIC.renderOffline(sec), L = b.getChannelData(0), R = b.getChannelData(1), n = L.length;
+    const dv = new DataView(new ArrayBuffer(44 + n * 4)); let o = 0;
+    const w = (v, sz) => { if (sz === 4) dv.setUint32(o, v, true); else dv.setUint16(o, v, true); o += sz; };
+    [0x46464952, 36 + n * 4, 0x45564157, 0x20746d66].forEach(v => w(v, 4)); w(16, 4); w(1, 2); w(2, 2); w(44100, 4); w(44100 * 4, 4); w(4, 2); w(16, 2); w(0x61746164, 4); w(n * 4, 4);
+    for (let i = 0; i < n; i++) { dv.setInt16(o, Math.max(-1, Math.min(1, L[i])) * 32767, true); dv.setInt16(o + 2, Math.max(-1, Math.min(1, R[i])) * 32767, true); o += 4; }
+    let bin = ""; const u = new Uint8Array(dv.buffer); for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }, focusNow() { G.stageZ = G.p[G.k] - G.sp.targets[G.k].z; G.zv = G.stageZ; G.dirty = true; }, nudge(um) { G.stageZ += um; G.dirty = true; } };
 
 })();
 </script>
