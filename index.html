@@ -162,6 +162,24 @@ body[data-screen="title"] .brand { pointer-events: none; }
 .ep-ring { position: absolute; inset: 1.4%; width: 97.2%; height: 97.2%; z-index: 2; pointer-events: none; transition: transform .25s var(--e-snap); }
 .ep-ring line { stroke: #8d8174; }
 .ep-ring line.maj { stroke: #c8b9a6; }
+/* timer: a draining arc on the eyepiece rim and a slanted plate, where your eyes already are */
+.ep-timer { position: absolute; inset: 0; z-index: 4; pointer-events: none; transition: opacity .3s; }
+.ep-timer.off, .game.judged .ep-timer { opacity: 0; }
+.ep-timer.off { display: none; }
+.et-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+.et-track { fill: none; stroke: rgba(255, 240, 220, .1); stroke-width: 2.4; }
+.et-arc { fill: none; stroke: var(--acc); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 100 100; filter: drop-shadow(0 0 3px var(--acc)); transition: stroke .3s; }
+.ep-timer.low .et-arc { stroke: var(--warn); filter: drop-shadow(0 0 6px var(--warn)); }
+.ep-timer.beat .et-arc { animation: arcFlash .5s ease-out; }
+@keyframes arcFlash { from { stroke-width: 5.5; } }
+.et-badge { position: absolute; right: -3%; top: 3%; display: grid; justify-items: center; padding: 6px 16px 8px; isolation: isolate; transform: rotate(var(--tilt)); }
+.et-badge::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); transform: skewX(var(--skew)); transition: background-color .25s; }
+.et-k { font: 600 10px var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.et-num { font: italic 900 38px/1 var(--f-display); font-stretch: 112%; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--ink); }
+.ep-timer.low .et-badge::before { background: var(--warn); border-color: transparent; }
+.ep-timer.low .et-num, .ep-timer.low .et-k { color: #fff; }
+.ep-timer.beat .et-badge { animation: timerBeat .5s var(--e-pop); }
+@keyframes timerBeat { from { transform: rotate(var(--tilt)) scale(1.25); } }
 .ep-label { position: absolute; left: 50%; bottom: 1.6%; transform: translateX(-50%); z-index: 3; font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; color: var(--scope-muted); text-transform: uppercase; white-space: nowrap; }
 
 /* ============ TITLE ============ */
@@ -258,7 +276,7 @@ body[data-screen="title"] .brand { pointer-events: none; }
 
 /* ============ GAME ============ */
 .game-screen { padding-bottom: 28px; }
-.hud { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 18px; padding-block: 10px 14px; }
+.hud { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 18px; padding-block: 10px 14px; }
 .hud-menu { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px 0 14px; border-radius: 13px; border: 1px solid var(--glass-edge); background: var(--glass-strong); box-shadow: var(--shadow), var(--hi); font: 800 13px var(--f-body); letter-spacing: .08em; text-transform: uppercase; }
 .burger { display: grid; gap: 3px; width: 16px; }
 .burger i { display: block; height: 2px; border-radius: 2px; background: currentColor; transform: skewX(var(--skew)); }
@@ -275,13 +293,6 @@ body[data-screen="title"] .brand { pointer-events: none; }
 .hud-track li.done { color: var(--ink); }
 .hud-track li.done::before { background: color-mix(in srgb, var(--acc) 16%, transparent); border-color: color-mix(in srgb, var(--acc) 30%, transparent); }
 .hud-track li.crashed { color: var(--warn); }
-.hud-timer { display: grid; justify-items: end; gap: 5px; min-width: 112px; }
-.ht-num { font: 500 30px/1 var(--f-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.ht-bar { width: 112px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; transform: skewX(var(--skew)); }
-.ht-bar i { display: block; height: 100%; width: 100%; background: var(--ink); transform-origin: left; }
-.hud-timer.low .ht-num { color: var(--warn); animation: tickPulse 1s steps(1) infinite; }
-.hud-timer.low .ht-bar i { background: var(--warn); }
-.hud-timer.off .ht-bar { opacity: .3; }
 @keyframes tickPulse { 50% { opacity: .55; } }
 
 .game { display: grid; grid-template-columns: 280px minmax(0, 1fr) 296px; grid-template-areas: "scope view dock"; gap: 22px; align-items: start; }
@@ -308,7 +319,7 @@ body[data-screen="title"] .brand { pointer-events: none; }
 .scope-art { width: 100%; height: auto; display: block; }
 .scope-art .move { transition: none; }
 .scope-art .turret { transition: transform .5s cubic-bezier(.3, 1.3, .5, 1); }
-.scope-art .knobspin { transition: transform .08s linear; }
+.scope-art .knobspin { transition: none; }
 .loupe { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: center; gap: 12px; margin: 4px 0 0; padding-top: 10px; border-top: 1px solid var(--line); }
 .loupe svg { display: block; width: 100%; height: auto; border-radius: 50%; box-shadow: 0 12px 26px -14px rgba(0, 0, 0, .55); background: var(--loupe-bg); }
 .loupe figcaption { display: grid; gap: 3px; font: 500 11px var(--f-mono); color: var(--muted); min-width: 0; }
@@ -320,8 +331,17 @@ body[data-screen="title"] .brand { pointer-events: none; }
 .scope-cap { margin: 0; font: 500 11.5px var(--f-mono); color: var(--muted); text-align: right; min-height: 1.5em; }
 .scope-cap.warn { color: var(--warn); }
 
-.knob { border-radius: 50%; width: 196px; height: 196px; align-self: center; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; filter: drop-shadow(0 14px 18px rgba(20, 12, 6, .3)); }
-.knob:active { cursor: grabbing; }
+.knob { border-radius: 50%; width: 196px; height: 196px; align-self: center; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; overflow: visible;
+  filter: drop-shadow(0 14px 18px rgba(20, 12, 6, .3)); transition: transform .2s var(--e-snap), filter .2s; }
+.knob.dragging { cursor: grabbing; transform: scale(.985); filter: drop-shadow(0 8px 10px rgba(20, 12, 6, .36)); }
+.k-bezel { fill: none; stroke: var(--line-strong); stroke-width: 1.4; }
+.k-index { fill: var(--acc); transition: fill .4s; }
+.k-trail { fill: none; stroke: var(--acc); stroke-width: 5; stroke-linecap: round; opacity: 0; pointer-events: none; }
+#kTrailF { stroke-width: 3.4; }
+.k-glow { fill: none; stroke: var(--acc); stroke-width: 2; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.knob.hover-coarse .k-glow-c, .knob.hover-fine .k-glow-f { opacity: .45; }
+.knob.drag-coarse .k-glow-c, .knob.drag-fine .k-glow-f { opacity: .9; }
+#gameRing { transition: none; }
 .knob-cap { margin: 0; font-size: 12.5px; color: var(--muted); text-align: center; }
 .dock-actions { display: grid; grid-template-columns: 1.3fr 1fr; gap: 10px; }
 .dock-actions .btn { padding: 0 12px; white-space: nowrap; }
@@ -344,6 +364,7 @@ body[data-screen="title"] .brand { pointer-events: none; }
 .jog-strip.fine::before { inset: 14px 0; opacity: .4; }
 .jog-strip::after { content: ""; position: absolute; left: 50%; top: 6px; bottom: 6px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--acc); }
 .jog-strip.coarse { --step: 22px; }
+.jog-strip.dragging { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--acc) 55%, transparent), var(--hi); }
 .jog-strip.fine { --step: 12px; }
 
 /* verdict */
@@ -619,16 +640,15 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
   .t-keys { display: none; }
   .t-word { font-size: 30vw; bottom: 2vw; }
 
-  .hud { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "menu track timer"; gap: 10px; padding-block: 6px 10px; }
+  .hud { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "menu track"; gap: 10px; padding-block: 6px 10px; }
   .hud-menu { grid-area: menu; padding: 0 12px; }
   .hud-menu-t, .hud-menu kbd { display: none; }
   .hud-slide { display: none; }
   .hud-track { grid-area: track; justify-content: center; }
   .hud-track li { min-width: 0; padding: 5px 10px 5px 8px; font-size: 11.5px; }
   .hud-track li small { display: none; }
-  .hud-timer { grid-area: timer; min-width: 0; }
-  .ht-num { font-size: 22px; }
-  .ht-bar { width: 72px; }
+  .et-num { font-size: 27px; }
+  .et-badge { padding: 4px 12px 6px; right: -1%; top: 2%; }
 
   .game { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scope" "view" "dock"; gap: 12px; }
   .g-scope { grid-template-columns: minmax(0, 1fr) 96px; grid-template-areas: "plate wrap" "target wrap"; padding: 12px; border-radius: 18px; gap: 8px 12px; }
@@ -761,7 +781,6 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
         <button class="hud-menu shine" id="pauseBtn" aria-label="Pause menu"><span class="burger" aria-hidden="true"><i></i><i></i><i></i></span><span class="hud-menu-t">Menu</span><kbd>Esc</kbd></button>
         <div class="hud-slide"><b id="hudMode">Brightfield</b><span id="slideName">Slide</span></div>
         <ol class="hud-track" id="hudTrack" aria-label="Objectives"><li></li><li></li><li></li></ol>
-        <div class="hud-timer" id="timer"><span class="ht-num" id="timerText">0:35</span><span class="ht-bar"><i id="timerFill"></i></span></div>
       </header>
 
       <div class="game" id="gameGrid">
@@ -856,6 +875,10 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
             <svg class="ep-ring" id="gameRing" viewBox="0 0 200 200" aria-hidden="true"></svg>
             <canvas id="scope" width="640" height="640" aria-label="Microscope field of view"></canvas>
             <div class="ep-label" id="epLabel">10x</div>
+            <div class="ep-timer" id="timer">
+              <svg class="et-ring" viewBox="0 0 200 200" aria-hidden="true"><circle class="et-track" cx="100" cy="100" r="98.2"/><circle class="et-arc" id="timerArc" cx="100" cy="100" r="98.2" pathLength="100"/></svg>
+              <div class="et-badge" role="timer" aria-label="Time left"><span class="et-k">Time</span><span class="et-num" id="timerText">0:40</span></div>
+            </div>
           </div>
         </div>
 
@@ -878,18 +901,28 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
             </div>
             <span class="zread" id="zRead">Z 0.00 µm</span>
           </div>
-          <p class="knob-cap">Spin fast to travel, slowly to focus. Outer ring is coarse, centre is fine.</p>
-          <svg class="knob" id="knob" viewBox="0 0 200 200" role="slider" tabindex="0" aria-label="Focus knob. Outer ring is coarse, centre is fine. Arrow keys for fine, Shift plus arrow for coarse." aria-valuetext="focus">
+          <p class="knob-cap">Turn fast to travel, slowly to focus. Outer ring is coarse, centre is fine.</p>
+          <svg class="knob" id="knob" viewBox="0 0 200 200" role="slider" tabindex="0" aria-label="Focus knob. Outer ring is coarse, centre is fine. Hold the arrow keys for fine, Shift plus arrow for coarse." aria-valuetext="focus">
             <defs>
-              <radialGradient id="kOuter" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#5a4c4d"/><stop offset="1" stop-color="#1e1618"/></radialGradient>
-              <radialGradient id="kInner" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#7a6a6a"/><stop offset="1" stop-color="#2e2426"/></radialGradient>
+              <radialGradient id="kFace" cx="50%" cy="42%" r="62%"><stop offset="0" stop-color="#4b4041"/><stop offset=".72" stop-color="#2b2224"/><stop offset="1" stop-color="#191214"/></radialGradient>
+              <radialGradient id="kFineFace" cx="46%" cy="38%" r="70%"><stop offset="0" stop-color="#6c5e5e"/><stop offset=".8" stop-color="#352a2c"/><stop offset="1" stop-color="#241b1d"/></radialGradient>
+              <linearGradient id="kSheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient>
             </defs>
-            <circle cx="100" cy="100" r="96" fill="url(#kOuter)"/>
+            <circle class="k-bezel" cx="100" cy="100" r="99"/>
+            <circle cx="100" cy="100" r="93" fill="url(#kFace)"/>
             <g id="coarseGroup"></g>
-            <circle cx="100" cy="100" r="58" fill="#150e10"/>
-            <circle cx="100" cy="100" r="54" fill="url(#kInner)"/>
+            <path id="kTrailC" class="k-trail"/>
+            <circle cx="100" cy="100" r="93" fill="url(#kSheen)" pointer-events="none"/>
+            <circle class="k-glow k-glow-c" cx="100" cy="100" r="95.5"/>
+            <circle cx="100" cy="100" r="60" fill="#120c0e"/>
+            <circle cx="100" cy="100" r="56" fill="url(#kFineFace)"/>
             <g id="fineGroup"></g>
-            <circle cx="100" cy="100" r="14" fill="var(--acc)"/>
+            <path id="kTrailF" class="k-trail"/>
+            <circle cx="100" cy="100" r="56" fill="url(#kSheen)" pointer-events="none"/>
+            <circle class="k-glow k-glow-f" cx="100" cy="100" r="58"/>
+            <circle cx="100" cy="100" r="15" fill="#1b1315"/>
+            <circle cx="100" cy="100" r="11" fill="var(--acc)"/>
+            <path class="k-index" d="M100 0.5 L104.5 6 L95.5 6 Z"/>
           </svg>
           <div class="jogs" id="jogs">
             <div class="jog"><span>Coarse</span><div class="jog-strip coarse" id="jogCoarse" aria-label="Coarse focus. Drag right to bring the lens down."></div></div>
@@ -979,7 +1012,7 @@ table.optics td:first-child { font-family: var(--f-body); font-weight: 800; }
         <h3>House rules of the bench</h3>
         <div class="rules">
           <div class="rule"><b>01</b><h4>Coarse first, at 10x only</h4><p>At 100x one coarse tick is about 40 times the depth of field, and a fast spin drives the lens into the slide.</p></div>
-          <div class="rule"><b>02</b><h4>Parfocal lenses</h4><p>Focus carries over when you swing objectives, so 40x and 100x need only a few fine ticks.</p></div>
+          <div class="rule"><b>02</b><h4>Parfocal lenses</h4><p>Focus carries over when you swing objectives, so 40x and 100x need only a small turn of fine focus.</p></div>
           <div class="rule"><b>03</b><h4>Oil at 100x</h4><p>The front lens has to sit in the oil. Without it the usable NA drops to about 0.95 and the image stays dim and soft.</p></div>
           <div class="rule"><b>04</b><h4>Watch for dust</h4><p>The top of the coverslip sits 170 µm above the smear. Specks up there come into focus first.</p></div>
         </div>
@@ -1173,7 +1206,7 @@ Object.values(MODES).forEach(m => m.objs.forEach(o => {
   o.dof = m.id === "confocal" ? confocalSection(m.lam, o.n, o.NA) : m.lam * o.n / (o.NA * o.NA);
 }));
 let OBJ = MODES.bright.objs;
-const COARSE_UM = 20, FINE_UM = 0.25, DUST_Z = 170;
+const DUST_Z = 170;
 const BLEACH = [0.006, 0.022, 0.04]; // per second of open shutter
 
 function effective(mode, k, oil, pinhole) {
@@ -2067,11 +2100,11 @@ const MUSIC = (() => {
       nextT += STEP; step++;
     }
   }
-  function sceneGain() { return scene === "game" ? 0.62 : 1; }
+  function sceneGain() { return scene === "game" ? 0.62 : scene === "tense" ? 0.4 : 1; }
   function applyScene(fast) {
     if (!A || !out) return;
     const now = A.currentTime, tc = fast ? 0.05 : 0.35;
-    bus.room.frequency.setTargetAtTime(scene === "game" ? 1500 : 16000, now, tc);
+    bus.room.frequency.setTargetAtTime(scene === "game" ? 1500 : scene === "tense" ? 850 : 16000, now, tc);
     if (playing) out.gain.setTargetAtTime(VOL * sceneGain() * (now < duckUntil ? 0.35 : 1), now, tc);
   }
   const VOL = 0.5;
@@ -2161,6 +2194,7 @@ function burst(A, dest, { t = 0, dur = 0.05, type = "bandpass", f = 1500, f2 = n
   n.connect(fl).connect(v).connect(dest); n.start(s); n.stop(s + dur + 0.02);
 }
 function sfx(name, opt = {}) {
+  if (window.__pf && window.__pf.log) window.__pf.log.push(name);
   if (!soundOn) return;
   try {
     const A = ac(), out = A.destination;
@@ -2181,6 +2215,11 @@ function sfx(name, opt = {}) {
       case "squish": burst(A, out, { dur: 0.16, type: "lowpass", f: 700, f2: 250, q: 1.4, g: 0.22 }); tone(A, out, { f: 420, f2: 210, dur: 0.12, g: 0.05 }); break;
       case "crack": for (let i = 0; i < 6; i++) burst(A, out, { t: i * 0.018 + Math.random() * 0.01, dur: 0.025, type: "highpass", f: 2500 + Math.random() * 3000, q: 0.7, g: 0.3 }); tone(A, out, { f: 180, f2: 60, dur: 0.2, g: 0.2 }); break;
       case "pause": tone(A, out, { f: 660, dur: 0.12, g: 0.05 }); tone(A, out, { f: 990, t: 0.07, dur: 0.16, g: 0.04 }); break;
+      case "tick": { const n = opt.n || 5, f = [0, 1760, 1568, 1397, 1245, 1109][n] || 1109;
+        tone(A, out, { f, dur: 0.06, g: n <= 3 ? 0.16 : 0.11 }); tone(A, out, { f: f * 2.01, dur: 0.035, g: 0.04 }); burst(A, out, { dur: 0.012, type: "highpass", f: 4200, q: 0.7, g: 0.12 });
+        if (n === 1) { tone(A, out, { f: f * 1.5, t: 0.12, dur: 0.07, g: 0.12 }); } break; }
+      case "timeup": [880, 698.46, 554.37].forEach((fr, i) => tone(A, out, { f: fr, t: i * 0.11, dur: 0.22, g: 0.12, type: "triangle", a: 0.006 })); burst(A, out, { dur: 0.3, type: "lowpass", f: 900, q: 0.7, g: 0.12 }); break;
+      case "stop": tone(A, out, { f: 120, f2: 62, dur: 0.14, g: 0.28 }); burst(A, out, { dur: 0.05, type: "lowpass", f: 700, q: 0.8, g: 0.22 }); break;
       case "lose": [392, 311.13].forEach((fr, i) => tone(A, out, { f: fr, t: i * 0.1, dur: 0.35, g: 0.1, type: "triangle", a: 0.02 })); break;
     }
   } catch (e) {}
@@ -2193,9 +2232,14 @@ function svgEl(tag, attrs, parent) { const e = document.createElementNS(NS, tag)
 (function drawKnobs() {
   const line = (g, x1, y1, x2, y2, stroke, w) => svgEl("line", { x1, y1, x2, y2, stroke, "stroke-width": w }, g);
   const cg = $("coarseGroup"), fg = $("fineGroup");
-  for (let i = 0; i < 48; i++) { const a = (i / 48) * Math.PI * 2; line(cg, 100 + Math.cos(a) * 66, 100 + Math.sin(a) * 66, 100 + Math.cos(a) * 93, 100 + Math.sin(a) * 93, i % 2 ? "#2a2022" : "#6a5c5d", 3); }
-  svgEl("circle", { cx: 100, cy: 14, r: 4, fill: "#f3e9d6" }, cg);
-  for (let i = 0; i < 40; i++) { const a = (i / 40) * Math.PI * 2 - Math.PI / 2, long = i % 5 === 0; line(fg, 100 + Math.cos(a) * (long ? 36 : 42), 100 + Math.sin(a) * (long ? 36 : 42), 100 + Math.cos(a) * 50, 100 + Math.sin(a) * 50, "#e5d3af", long ? 1.6 : 1); }
+  // coarse: fine knurling on the rim only, a soft machined groove, and a cream index line
+  for (let i = 0; i < 132; i++) { const a = (i / 132) * Math.PI * 2; line(cg, 100 + Math.cos(a) * 86, 100 + Math.sin(a) * 86, 100 + Math.cos(a) * 92.5, 100 + Math.sin(a) * 92.5, i % 2 ? "rgba(0,0,0,.45)" : "rgba(255,240,225,.13)", 1.6); }
+  svgEl("circle", { cx: 100, cy: 100, r: 84, fill: "none", stroke: "rgba(0,0,0,.35)", "stroke-width": 1.2 }, cg);
+  svgEl("circle", { cx: 100, cy: 100, r: 66, fill: "none", stroke: "rgba(255,240,225,.06)", "stroke-width": 1 }, cg);
+  svgEl("rect", { x: 97, y: 13, width: 6, height: 19, rx: 3, fill: "#f3e9d6" }, cg);
+  // fine: a graduated scale like a real fine-focus collar, and a small accent index
+  for (let i = 0; i < 60; i++) { const a = (i / 60) * Math.PI * 2 - Math.PI / 2, long = i % 5 === 0; line(fg, 100 + Math.cos(a) * (long ? 44 : 48), 100 + Math.sin(a) * (long ? 44 : 48), 100 + Math.cos(a) * 53.5, 100 + Math.sin(a) * 53.5, long ? "rgba(236,222,196,.75)" : "rgba(236,222,196,.38)", long ? 1.3 : 0.8); }
+    svgEl("rect", { x: 98.4, y: 51, width: 3.2, height: 11, rx: 1.6, fill: "#f3e9d6" }, fg);
   const acG = $("artCoarse"), af = $("artFine");
   for (let i = 0; i < 16; i++) { const a = (i / 16) * Math.PI * 2; line(acG, Math.cos(a) * 15, Math.sin(a) * 15, Math.cos(a) * 23, Math.sin(a) * 23, "#8a7a78", 2); }
   for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI * 2; line(af, Math.cos(a) * 6, Math.sin(a) * 6, Math.cos(a) * 12, Math.sin(a) * 12, "#d8c8a8", 1.2); }
@@ -2628,7 +2672,7 @@ function startGameNow({ daily, tut, seed: seedIn, mode }) {
     coarseHigh: [false, false, false], results: [], lessons: [],
     layers: buildLayers(sp, OBJ[0], false),
     t0: performance.now(), locked: false, ready: false, paused: false, pausedAt: 0, dirty: true,
-    accum: { drag: 0, wheel: 0 }, knobAngle: { coarse: 0, fine: 0 }, jogPos: { coarse: 0, fine: 0 }, lastCoarse: 0,
+    coarseUm: [0, 0, 0], lastWhole: null,
     quipRng: makeRng(seed, "quips"), setupRng: S,
     cube: "dapi", shutter: true, exposure: [0, 0, 0], signal: 1, signalDrawn: 1, pinhole: 1, lastNoise: 0, lastT: performance.now(),
   };
@@ -2746,71 +2790,191 @@ document.querySelectorAll("#cubeSeg button").forEach(b => b.addEventListener("cl
 $("shutterBtn").addEventListener("click", () => { if (!canAct()) return; G.shutter = !G.shutter; syncShutter(); sfx("coarse"); });
 document.querySelectorAll("#pinSeg button").forEach(b => b.addEventListener("click", () => { if (!canAct()) return; G.pinhole = +b.dataset.pin; syncPinhole(); sfx("fine"); }));
 
-/* ---------- Focus controls ---------- */
-function rotateKnobArt(kind) {
-  const a = G.knobAngle[kind];
-  $(kind === "coarse" ? "coarseGroup" : "fineGroup").setAttribute("transform", `rotate(${a} 100 100)`);
-  $(kind === "coarse" ? "artCoarse" : "artFine").style.transform = `rotate(${a}deg)`;
-  $(kind === "coarse" ? "jogCoarse" : "jogFine").style.setProperty("--pos", `${G.jogPos[kind]}px`);
-  $("gameRing").style.transform = `rotate(${G.knobAngle.coarse * 0.2 + G.knobAngle.fine * 0.45}deg)`;
+/* ---------- Focus controls: fluid, damped knobs ----------
+   A real focus knob has no detents: the stage rides on greased rails and follows your hand smoothly.
+   Input adds rotation; a viscous drive (time constant tau) delivers it to the stage frame by frame, so
+   the image slides continuously through focus instead of jumping between blur levels. Turning faster
+   gears the knob up (up to maxGain), the way a quick spin of coarse covers millimetres. */
+const KNOB = {
+  coarse: { umPerDeg: 0.8,  maxGain: 6, w0: 90, w1: 900, tau: 0.085, jogDegPerPx: 1.5 },
+  fine:   { umPerDeg: 0.07, maxGain: 4, w0: 60, w1: 600, tau: 0.06,  jogDegPerPx: 0.9 },
+};
+const drive = { coarse: { pendZ: 0, pendA: 0, ang: 0, w: 0, va: 0, lastT: 0 }, fine: { pendZ: 0, pendA: 0, ang: 0, w: 0, va: 0, lastT: 0 } };
+let keyHold = null; // { kind, dir, t0 }
+function turn(kind, dA, now = performance.now()) {
+  if (!canAct() || !dA) return;
+  const k = KNOB[kind], s = drive[kind];
+  const dt = clamp((now - (s.lastT || now - 16)) / 1000, 0.008, 0.25); s.lastT = now;
+  s.w = s.w * 0.55 + (Math.abs(dA) / dt) * 0.45;                    // smoothed hand speed, deg/s
+  const x = clamp((s.w - k.w0) / (k.w1 - k.w0), 0, 1);
+  const gain = 1 + (k.maxGain - 1) * x * x * (3 - 2 * x);
+  const dz = dA * k.umPerDeg * gain;
+  s.pendZ += dz; s.pendA += dA;
+  if (kind === "coarse" && G.k > 0) { G.coarseUm[G.k] += Math.abs(dz); if (G.coarseUm[G.k] > 2) G.coarseHigh[G.k] = true; }
 }
-/* Coarse focus speeds up when you spin fast, like a real rack and pinion: up to 5x per tick. */
-function applyTicks(kind, n) {
-  if (!canAct() || n === 0) return;
-  let step = FINE_UM;
-  if (kind === "coarse") {
-    const now = performance.now(), gap = now - G.lastCoarse; G.lastCoarse = now;
-    const mult = gap < 140 ? Math.min(5, 1 + (140 - gap) / 28) : 1;
-    step = COARSE_UM * mult;
-    if (G.k > 0) G.coarseHigh[G.k] = true;
+function turnsOf(um) { const deg = um / KNOB.coarse.umPerDeg; return deg < 360 ? `about ${Math.round(deg / 5) * 5}°` : `about ${(deg / 360).toFixed(1)} turns`; }
+function haltFocus() { for (const s of Object.values(drive)) { s.pendZ = 0; s.pendA = 0; s.va = 0; s.w = 0; } keyHold = null; knobSound(0, 0); knobArt(); }
+function stepFocus(dt) {
+  if (!G) return;
+  if (keyHold && canAct()) {
+    // holding a key turns the knob at a speed that builds over about a second and a half
+    const t = (performance.now() - keyHold.t0) / 1000;
+    if (t > 0.16) {
+      const r = clamp((t - 0.16) / 1.4, 0, 1), ease = r * r * (3 - 2 * r);
+      const w = keyHold.kind === "coarse" ? 70 + 650 * ease : 28 + 210 * ease;
+      turn(keyHold.kind, keyHold.dir * w * dt);
+    }
   }
-  G.stageZ = clamp(G.stageZ + n * step, -4000, 4000);
-  G.knobAngle[kind] += n * (kind === "coarse" ? 15 : 9);
-  G.jogPos[kind] += n * (kind === "coarse" ? 22 : 12);
-  rotateKnobArt(kind);
-  sfx(kind); buzz();
-  if (d() > OBJ[G.k].wd) crash("knob");
-  G.dirty = true;
+  let moved = false;
+  for (const kind of ["coarse", "fine"]) {
+    const s = drive[kind];
+    if (Math.abs(s.pendA) < 0.004 && Math.abs(s.pendZ) < 0.0004) { s.pendA = 0; s.pendZ = 0; s.va = 0; continue; }
+    const f = 1 - Math.exp(-dt / KNOB[kind].tau);
+    let dz = s.pendZ * f; const da = s.pendA * f;
+    s.pendZ -= dz; s.pendA -= da; s.ang += da; s.va = da / dt;
+    const nz = G.stageZ + dz;
+    if (nz > 4000 || nz < -4000) { dz = clamp(nz, -4000, 4000) - G.stageZ; s.pendZ = 0; s.pendA = 0; s.va = 0; endStop(); }
+    G.stageZ += dz; moved = true;
+  }
+  if (moved) {
+    G.zv = G.stageZ; G.dirty = true; knobArt();
+    if (G.ready && !G.locked && d() > OBJ[G.k].wd) { haltFocus(); crash("knob"); }
+  }
+  knobSound(drive.coarse.va, drive.fine.va);
 }
+let lastStop = 0;
+function endStop() { const now = performance.now(); if (now - lastStop > 400) { lastStop = now; sfx("stop"); buzz(8); } }
+function arcPath(r, a0, a1) {
+  const p = (a) => { const t = (a - 90) * Math.PI / 180; return `${(100 + r * Math.cos(t)).toFixed(2)} ${(100 + r * Math.sin(t)).toFixed(2)}`; };
+  const large = Math.abs(a1 - a0) > 180 ? 1 : 0, sweep = a1 > a0 ? 1 : 0;
+  return `M${p(a0)} A${r} ${r} 0 ${large} ${sweep} ${p(a1)}`;
+}
+function knobArt() {
+  const c = drive.coarse, fn = drive.fine;
+  $("coarseGroup").setAttribute("transform", `rotate(${c.ang.toFixed(2)} 100 100)`);
+  $("fineGroup").setAttribute("transform", `rotate(${fn.ang.toFixed(2)} 100 100)`);
+  $("artCoarse").style.transform = `rotate(${c.ang.toFixed(2)}deg)`;
+  $("artFine").style.transform = `rotate(${fn.ang.toFixed(2)}deg)`;
+  $("jogCoarse").style.setProperty("--pos", `${(c.ang / KNOB.coarse.jogDegPerPx).toFixed(1)}px`);
+  $("jogFine").style.setProperty("--pos", `${(fn.ang / KNOB.fine.jogDegPerPx).toFixed(1)}px`);
+  $("gameRing").style.transform = `rotate(${(c.ang * 0.06 + fn.ang * 0.25).toFixed(2)}deg)`;
+  // a light trail behind each indicator, as long as the knob is fast
+  for (const [id, s, r] of [["kTrailC", c, 76], ["kTrailF", fn, 41]]) {
+    const len = clamp(Math.abs(s.va) * 0.16, 0, 140), el = $(id);
+    if (len < 2) { el.setAttribute("d", ""); continue; }
+    const a = ((s.ang % 360) + 360) % 360, dir = s.va > 0 ? -1 : 1;
+    el.setAttribute("d", arcPath(r, a + dir * len, a));
+    el.style.opacity = (0.35 + 0.55 * len / 140).toFixed(2);
+  }
+}
+
+/* Knob sound: no clicks. The coarse rack gives a soft, low purr whose flutter follows its speed;
+   the fine knob is a quiet, silky hiss. Both swell and fade with how fast you turn. */
+let knobSnd = null, knobSndT = 0;
+function knobAudio(A) {
+  const src = A.createBufferSource(); src.buffer = noise(2.0); src.loop = true;
+  const cBp = A.createBiquadFilter(); cBp.type = "bandpass"; cBp.frequency.value = 320; cBp.Q.value = 0.8;
+  const cLp = A.createBiquadFilter(); cLp.type = "lowpass"; cLp.frequency.value = 1500;
+  const cAm = A.createGain(); cAm.gain.value = 0.72;
+  const cLfo = A.createOscillator(); cLfo.type = "triangle"; cLfo.frequency.value = 10;
+  const cDepth = A.createGain(); cDepth.gain.value = 0.28; cLfo.connect(cDepth).connect(cAm.gain);
+  const cOut = A.createGain(); cOut.gain.value = 0;
+  src.connect(cBp).connect(cLp).connect(cAm).connect(cOut).connect(A.destination);
+  const hum = A.createOscillator(); hum.type = "sine"; hum.frequency.value = 60;
+  const humG = A.createGain(); humG.gain.value = 0; hum.connect(humG).connect(A.destination);
+  const fBp = A.createBiquadFilter(); fBp.type = "bandpass"; fBp.frequency.value = 2000; fBp.Q.value = 1.1;
+  const fLp = A.createBiquadFilter(); fLp.type = "lowpass"; fLp.frequency.value = 5200;
+  const fOut = A.createGain(); fOut.gain.value = 0;
+  src.connect(fBp).connect(fLp).connect(fOut).connect(A.destination);
+  src.start(); cLfo.start(); hum.start();
+  return { A, cBp, cOut, cLfo, hum, humG, fBp, fOut, lc: 0, lf: 0 };
+}
+function knobLevels(S, vc, vf, t, tc = 0.035) {
+  const sc = Math.min(1, Math.abs(vc) / 520), sf = Math.min(1, Math.abs(vf) / 260);
+  S.cOut.gain.setTargetAtTime(0.32 * Math.pow(sc, 0.75), t, tc);
+  S.cBp.frequency.setTargetAtTime(240 + 480 * sc, t, 0.05);
+  S.cLfo.frequency.setTargetAtTime(5 + 24 * sc, t, 0.05);
+  S.humG.gain.setTargetAtTime(0.03 * sc, t, tc);
+  S.hum.frequency.setTargetAtTime(52 + 58 * sc, t, 0.06);
+  S.fOut.gain.setTargetAtTime(0.1 * Math.pow(sf, 0.75), t, tc);
+  S.fBp.frequency.setTargetAtTime(1500 + 1600 * sf, t, 0.05);
+  S.lc = sc; S.lf = sf;
+}
+function knobSound(vc, vf) {
+  const live = soundOn && (Math.abs(vc) > 0.5 || Math.abs(vf) > 0.5);
+  if (!knobSnd) { if (!live) return; try { knobSnd = knobAudio(ac()); } catch (e) { return; } }
+  if (!soundOn) { vc = 0; vf = 0; }
+  const now = performance.now();
+  const sc = Math.min(1, Math.abs(vc) / 520), sf = Math.min(1, Math.abs(vf) / 260);
+  if (now - knobSndT < 33 && Math.abs(sc - knobSnd.lc) < 0.04 && Math.abs(sf - knobSnd.lf) < 0.04) return;
+  knobSndT = now;
+  try { knobLevels(knobSnd, vc, vf, knobSnd.A.currentTime); } catch (e) {}
+}
+
 (function wireKnob() {
   const knob = $("knob");
-  let dragging = null, lastAngle = 0;
+  let dragging = null, lastAngle = 0, last = null;
   const center = () => { const r = knob.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, scale: r.width / 200 }; };
-  const which = (e) => { const c = center(); return Math.hypot(e.clientX - c.x, e.clientY - c.y) / c.scale < 58 ? "fine" : "coarse"; };
+  const radius = (e) => { const c = center(); return Math.hypot(e.clientX - c.x, e.clientY - c.y) / c.scale; };
+  const which = (e) => radius(e) < 59 ? "fine" : "coarse";
   const angle = (e) => { const c = center(); return Math.atan2(e.clientY - c.y, e.clientX - c.x) * 180 / Math.PI; };
-  knob.addEventListener("pointerdown", (e) => { if (!G) return; dragging = which(e); lastAngle = angle(e); G.accum.drag = 0; knob.setPointerCapture(e.pointerId); e.preventDefault(); });
-  knob.addEventListener("pointermove", (e) => {
-    if (!dragging || !G) return;
-    const a = angle(e); let da = a - lastAngle;
-    if (da > 180) da -= 360; if (da < -180) da += 360;
-    lastAngle = a; G.accum.drag += da;
-    const stepA = dragging === "coarse" ? 15 : 9, n = Math.trunc(G.accum.drag / stepA);
-    if (n) { G.accum.drag -= n * stepA; applyTicks(dragging, n); }
+  const mark = (cls) => { knob.classList.remove("hover-coarse", "hover-fine"); if (cls) knob.classList.add(cls); };
+  knob.addEventListener("pointerdown", (e) => {
+    if (!G) return;
+    dragging = which(e); lastAngle = angle(e); last = { x: e.clientX, y: e.clientY };
+    knob.setPointerCapture(e.pointerId); knob.classList.add("dragging", "drag-" + dragging); mark("hover-" + dragging);
+    drive[dragging].lastT = e.timeStamp || performance.now();
+    e.preventDefault();
   });
-  const end = () => { dragging = null; };
+  knob.addEventListener("pointermove", (e) => {
+    if (!G) return;
+    if (!dragging) { if (e.pointerType === "mouse") mark("hover-" + which(e)); return; }
+    let da;
+    if (radius(e) > 22) {
+      // turn by the angle swept around the centre
+      const a = angle(e); da = a - lastAngle; if (da > 180) da -= 360; if (da < -180) da += 360; lastAngle = a;
+    } else {
+      // too close to the centre for a clean angle: read a straight drag as rotation instead
+      da = ((e.clientX - last.x) - (e.clientY - last.y)) * 0.8; lastAngle = angle(e);
+    }
+    last = { x: e.clientX, y: e.clientY };
+    turn(dragging, da, e.timeStamp || performance.now());
+  });
+  const end = () => { if (dragging) knob.classList.remove("dragging", "drag-coarse", "drag-fine"); dragging = null; };
   knob.addEventListener("pointerup", end); knob.addEventListener("pointercancel", end);
+  knob.addEventListener("pointerleave", () => { if (!dragging) mark(null); });
   knob.addEventListener("wheel", (e) => {
     if (!G) return;
     e.preventDefault();
-    const kind = which(e), dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
-    G.accum.wheel += -dy;
-    const n = Math.trunc(G.accum.wheel / 40);
-    if (n) { G.accum.wheel -= n * 40; applyTicks(kind, n); }
+    const kind = which(e), px = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 400 : 1);
+    mark("hover-" + kind);
+    turn(kind, -px * (kind === "coarse" ? 0.15 : 0.06), e.timeStamp || performance.now());
   }, { passive: false });
 })();
-[["jogCoarse", "coarse", 22], ["jogFine", "fine", 12]].forEach(([id, kind, px]) => {
+[["jogCoarse", "coarse"], ["jogFine", "fine"]].forEach(([id, kind]) => {
   const el = $(id);
-  let lastX = null, acc = 0;
-  el.addEventListener("pointerdown", (e) => { if (!G) return; lastX = e.clientX; acc = 0; el.setPointerCapture(e.pointerId); e.preventDefault(); });
+  let lastX = null;
+  el.addEventListener("pointerdown", (e) => { if (!G) return; lastX = e.clientX; drive[kind].lastT = e.timeStamp || performance.now(); el.setPointerCapture(e.pointerId); el.classList.add("dragging"); e.preventDefault(); });
   el.addEventListener("pointermove", (e) => {
     if (lastX == null || !G) return;
-    acc += e.clientX - lastX; lastX = e.clientX;
-    const n = Math.trunc(acc / px);
-    if (n) { acc -= n * px; applyTicks(kind, n); }
+    const dx = e.clientX - lastX; lastX = e.clientX;
+    turn(kind, dx * KNOB[kind].jogDegPerPx, e.timeStamp || performance.now());
   });
-  const end = () => { lastX = null; };
+  const end = () => { lastX = null; el.classList.remove("dragging"); };
   el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
 });
+function startHold(kind, dir) {
+  if (!canAct()) return;
+  if (keyHold && keyHold.kind === kind && keyHold.dir === dir) return;
+  keyHold = { kind, dir, t0: performance.now() };
+  drive[kind].lastT = performance.now() - 60;
+  turn(kind, dir * (kind === "coarse" ? 12 : 4));          // a tap is a small nudge
+}
+document.addEventListener("keyup", (e) => {
+  if (!keyHold) return;
+  if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Shift"].includes(e.key)) keyHold = null;
+});
+window.addEventListener("blur", () => { keyHold = null; });
 
 /* Oil: swing the lens aside, drop, swing back into the bead. */
 async function addOil() {
@@ -2941,10 +3105,10 @@ const TUT = (() => {
     { stage: 0, pre: true, target: () => "#eyepieceBox", next: true, text: () => "This is the <b>eyepiece</b> at 10x. It's a blur because the lens is still far above the slide." },
     { stage: 0, pre: true, target: () => "#loupe", next: true, text: () => "The <b>loupe</b> magnifies the gap between the lens and the coverslip. Watch it as you focus." },
     { stage: 0, pre: true, target: coarseCtl, done: () => d() > -200,
-      text: () => isPhone() ? "Drag the <b>Coarse</b> strip right to bring the lens down. Drag fast to travel, slowly near the end." : "Spin the <b>outer ring</b> clockwise to bring the lens down (or scroll on it, or Shift + ↑). Spin fast to travel, slowly near the end." },
+      text: () => isPhone() ? "Drag the <b>Coarse</b> strip right to bring the lens down. Drag fast to travel, slowly near the end." : "Spin the <b>outer ring</b> clockwise to bring the lens down (or scroll on it, or hold Shift + ↑). Spin fast to travel, slowly near the end." },
     { stage: 0, pre: true, target: () => "#eyepieceBox", done: () => d() > -45, text: () => "Specks snapping into focus? That's <b>dust on top of the coverslip</b>, 170 µm above the smear. Keep going down." },
     { stage: 0, pre: true, target: fineCtl, done: () => acc() > 0.7,
-      text: () => isPhone() ? "Nearly there. Use the <b>Fine</b> strip, 0.25 µm a tick, and sharpen the purple smear." : "Nearly there. Use the <b>centre</b> of the knob, or ↑ and ↓, for fine focus at 0.25 µm a tick. Sharpen the purple smear." },
+      text: () => isPhone() ? "Nearly there. Drag the <b>Fine</b> strip slowly and sharpen the purple smear." : "Nearly there. Use the <b>centre</b> of the knob, or ↑ and ↓, for fine focus. Turned slowly it moves a fraction of a micron. Sharpen the purple smear." },
     { stage: 0, pre: true, target: () => "#lockBtn", done: () => G.locked, text: () => "Sharp. Press <b>Lock focus</b>. Your score is how close you are against the 8.8 µm depth of field at 10x." },
     { stage: 0, post: true, target: () => "#nextBtn", text: () => "That's your verdict. Now swing in the <b>40x</b> objective." },
     { stage: 1, pre: true, target: fineCtl, done: () => acc() > 0.75, text: () => "Objectives are <b>parfocal</b>, so the focus carried over. Use only fine focus here. Coarse at 40x costs points." },
@@ -3168,7 +3332,7 @@ async function toNextStage() {
   G.crashed = false; G.fresh = wasBroken;
   if (wasBroken) { const o = OBJ[G.k]; G.stageZ = G.p[G.k] - tgt().z - G.setupRng.range(3, 6) * o.dof; G.zv = G.stageZ; G.oil = false; G.contact = false; }
   G.layers = buildLayers(G.sp, OBJ[G.k], G.k === 2);
-  G.locked = false; G.accum.drag = 0; G.accum.wheel = 0;
+  G.locked = false; haltFocus();
   flip(view, () => { gameGrid.classList.remove("judged"); play(vEl, null); });
   setStageUI();
   $("lockBtn").disabled = true; $("oilBtn").disabled = true;
@@ -3184,16 +3348,16 @@ async function toNextStage() {
   beginStage();
   if (!isPhone()) $("knob").focus({ preventScroll: true });
 }
-function beginStage() { G.ready = true; G.t0 = performance.now(); G.lastT = performance.now(); setStageUI(); }
+function beginStage() { G.ready = true; G.t0 = performance.now(); G.lastT = performance.now(); G.lastWhole = null; $("timer").classList.remove("low", "beat"); $("timerArc").style.strokeDashoffset = "0"; MUSIC.setScene(current === "game" && !pauseOpen ? "game" : "menu"); setStageUI(); }
 function crash(how) {
-  G.crashed = true; G.locked = true; G.ready = false;
+  G.crashed = true; G.locked = true; G.ready = false; haltFocus();
   const o = OBJ[G.k];
   sfx("crack"); buzz([40, 30, 80]);
   const ep = $("eyepieceBox"); ep.animate([{ transform: "translate(0,0)" }, { transform: "translate(-7px,4px)" }, { transform: "translate(6px,-3px)" }, { transform: "translate(-3px,2px)" }, { transform: "none" }], { duration: 320 });
   G.results[G.stage] = { mag: o.mag, score: 0, acc: 0, crashed: true };
   const note = how === "switch"
     ? `The ${o.mag}x objective hit the slide as it swung in. Its working distance is only ${fmtWD(o.wd)}, and the lens was still too low. Get sharp at the lower power before switching up.`
-    : `The ${o.mag}x objective hit the slide. At this power the lens sits ${fmtWD(o.wd)} above the coverslip, about ${Math.round(o.wd / COARSE_UM)} slow coarse ticks, and far fewer fast ones.`;
+    : `The ${o.mag}x objective hit the slide. At this power the lens sits ${fmtWD(o.wd)} above the coverslip, which is ${turnsOf(o.wd)} of the coarse knob turned slowly, and far less turned fast.`;
   G.lessons.push(note);
   const notes = [note];
   if (G.stage < 2) notes.push(`This round scores 0. A fresh slide goes on for ${OBJ[G.k + 1].mag}x, so you can keep playing.`);
@@ -3202,7 +3366,7 @@ function crash(how) {
 }
 function lock(timeout) {
   if (!G || G.locked || !G.ready || G.paused || G.busyAnim) return;
-  G.locked = true;
+  G.locked = true; haltFocus(); if (MUSIC) MUSIC.setScene("game");
   const o = OBJ[G.k], e = eff(), t = tgt();
   const er = err();
   const acc = Math.exp(-Math.LN2 * (2 * er / e.dof) ** 2);
@@ -3216,7 +3380,7 @@ function lock(timeout) {
   const notes = [];
   const ae = Math.abs(er);
   notes.push(`${ae < 0.005 ? "Dead on the focal plane" : `Off by ${ae < 10 ? ae.toFixed(2) : ae.toFixed(0)} µm, ${er > 0 ? "lens too close" : "lens too far"}`}. ${G.mode === "confocal" ? "Optical section" : "Depth of field"} at ${o.mag}x${G.k === 2 && !immersed() ? " without oil" : ""} is ${e.dof.toFixed(2)} µm.`);
-  if (G.coarseHigh[G.k]) { score -= 150; bd.push(["Coarse at " + o.mag + "x", "−150", true]); notes.push(`Coarse focus at ${o.mag}x. One slow tick is 20 µm, about ${Math.round(COARSE_UM / o.dof)}× the ${G.mode === "confocal" ? "section" : "depth of field"} here.`); }
+  if (G.coarseHigh[G.k]) { score -= 150; bd.push(["Coarse at " + o.mag + "x", "−150", true]); notes.push(`Coarse focus at ${o.mag}x. Even a slow 10° nudge of coarse moves ${Math.round(10 * KNOB.coarse.umPerDeg)} µm, about ${Math.round(10 * KNOB.coarse.umPerDeg / o.dof)}× the ${G.mode === "confocal" ? "section" : "depth of field"} here.`); }
   if (G.k === 2 && !immersed()) { score *= 0.5; bd.push(["No oil", "×0.5", true]); notes.push(G.oil ? "The oil was on the slide but the front lens wasn't in it. Air between lens and coverslip caps the NA near 0.95." : "No immersion oil. Air between lens and coverslip caps the NA near 0.95, so the image stayed dim and soft."); }
   if (G.k === 1 && G.oilOn40) { score -= 100; bd.push(["Oil on 40x", "−100", true]); notes.push("The dry 40x lens dipped into the oil. It smears the front element; add oil only for 100x."); }
   if (G.mode === "fluor") {
@@ -3233,7 +3397,7 @@ function lock(timeout) {
     if (lay[0].x !== t && lay[0].dd < 1) notes.push(`You were sitting on the ${lay[0].x.label}, not the ${t.label}.`);
   }
   if (timeout) notes.push("Time ran out, so focus was locked where it was.");
-  if (acc > 0.8 && G.k === 1 && !G.coarseHigh[1] && !G.fresh) notes.push("Parfocal lenses: the 10x focus carried over, so a few fine ticks were enough.");
+  if (acc > 0.8 && G.k === 1 && !G.coarseHigh[1] && !G.fresh) notes.push("Parfocal lenses: the 10x focus carried over, so a small turn of fine was enough.");
   score = Math.max(0, Math.round(score));
   G.results[G.stage] = { mag: o.mag, score, acc, err: er };
   G.lessons.push(...notes.slice(1).filter(n => !n.startsWith("Parfocal")));
@@ -3261,8 +3425,8 @@ function pauseCtx(act) {
     resume: `<h3>Paused</h3><p>${MODES[G.mode].name} · ${escapeHtml($("slideName").textContent)}</p><dl><dt>Objective</dt><dd>${o.mag}x · ${o.sub}</dd><dt>Round</dt><dd>${G.stage + 1} of 3</dd><dt>Clock</dt><dd>${G.timed ? `${Math.ceil(rem)} s left, stopped while paused` : "Timeless"}</dd><dt>Score so far</dt><dd>${sofar} / 3000</dd></dl>`,
     restart: `<h3>Restart slide</h3><p>Start this same slide again from 10x. Your score so far is dropped.</p>`,
     controls: touch
-      ? `<h3>Controls</h3><dl><dt>Coarse</dt><dd>Drag the Coarse strip. Fast drags travel further.</dd><dt>Fine</dt><dd>Drag the Fine strip, 0.25 µm a tick.</dd><dt>Lock</dt><dd>Lock focus button</dd><dt>Oil</dt><dd>Add oil button, at 100x</dd></dl>`
-      : `<h3>Controls</h3><dl><dt>Coarse</dt><dd>Outer ring, Shift + ↑ ↓, or PgUp PgDn. Fast spins travel further.</dd><dt>Fine</dt><dd>Centre of the knob, or ↑ ↓</dd><dt>Lock</dt><dd>Enter</dd><dt>Oil</dt><dd>O, at 100x</dd>${G.mode === "fluor" ? "<dt>Cube</dt><dd>C · shutter S</dd>" : ""}${G.mode === "confocal" ? "<dt>Pinhole</dt><dd>P</dd>" : ""}<dt>Menu</dt><dd>Esc</dd></dl>`,
+      ? `<h3>Controls</h3><dl><dt>Coarse</dt><dd>Drag the Coarse strip. Fast drags travel further.</dd><dt>Fine</dt><dd>Drag the Fine strip slowly. It glides, with no steps.</dd><dt>Lock</dt><dd>Lock focus button</dd><dt>Oil</dt><dd>Add oil button, at 100x</dd></dl>`
+      : `<h3>Controls</h3><dl><dt>Coarse</dt><dd>Turn the outer ring, or hold Shift + ↑ ↓. Fast turns travel further.</dd><dt>Fine</dt><dd>Turn the centre of the knob, or hold ↑ ↓. It speeds up the longer you hold.</dd><dt>Lock</dt><dd>Enter</dd><dt>Oil</dt><dd>O, at 100x</dd>${G.mode === "fluor" ? "<dt>Cube</dt><dd>C · shutter S</dd>" : ""}${G.mode === "confocal" ? "<dt>Pinhole</dt><dd>P</dd>" : ""}<dt>Menu</dt><dd>Esc</dd></dl>`,
     sound: `<h3>Sound</h3><p>Knob clicks, menu sounds and the victory tune. Turning sound off also silences the music. Currently ${soundOn ? "on" : "off"}.</p>`,
     music: `<h3>Music</h3><p>An original lounge-jazz loop played live by your browser. It turns down while you focus and opens up in the menus. Currently ${musicOn && soundOn ? "on" : "off"}. Shortcut: B.</p>`,
     quit: `<h3>Quit to title</h3><p>You'll leave this slide. ${G.daily ? "Daily slides can be replayed any time today." : "Practice slides are random, so this one won't come back."}</p>`,
@@ -3585,8 +3749,8 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") { e.preventDefault(); if (slamSkip) slamSkip(); else openPause(); return; }
     if (e.key === "Enter" && slamSkip) { e.preventDefault(); slamSkip(); return; }
     const tag = (e.target.tagName || "").toLowerCase();
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); applyTicks(e.shiftKey ? "coarse" : "fine", e.key === "ArrowUp" ? 1 : -1); }
-    else if (e.key === "PageUp" || e.key === "PageDown") { e.preventDefault(); applyTicks("coarse", e.key === "PageUp" ? 1 : -1); }
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); if (!e.repeat) startHold(e.shiftKey ? "coarse" : "fine", e.key === "ArrowUp" ? 1 : -1); }
+    else if (e.key === "PageUp" || e.key === "PageDown") { e.preventDefault(); if (!e.repeat) startHold("coarse", e.key === "PageUp" ? 1 : -1); }
     else if (e.key === "Enter" && tag !== "button") { e.preventDefault(); if (!G.locked && !G.crashed) lock(false); else if (gameGrid.classList.contains("judged")) $("nextBtn").click(); }
     else if (e.key === "o" || e.key === "O") addOil();
     else if (e.key === "b" || e.key === "B") toggleMusic();
@@ -3621,11 +3785,20 @@ function loop(now) {
     const dt = Math.min(0.1, (now - (G.lastT || now)) / 1000); G.lastT = now;
     if (!G.paused) {
       if (G.timed && G.ready && !G.locked && !G.crashed && !G.busyAnim) {
-        const rem = Math.max(0, o.time - (now - G.t0) / 1000);
-        $("timerFill").style.transform = `scaleX(${(rem / o.time).toFixed(4)})`;
-        $("timer").classList.toggle("low", rem < 6);
-        $("timerText").textContent = `0:${String(Math.ceil(rem)).padStart(2, "0")}`;
-        if (rem <= 0) lock(true);
+        const rem = Math.max(0, o.time - (now - G.t0) / 1000), whole = Math.ceil(rem), low = rem <= 5;
+        $("timerArc").style.strokeDashoffset = (100 * (1 - rem / o.time)).toFixed(2);
+        $("timer").classList.toggle("low", low);
+        if (whole !== G.lastWhole) {
+          G.lastWhole = whole;
+          $("timerText").textContent = `0:${String(whole).padStart(2, "0")}`;
+          if (low && whole > 0) {
+            // the last five seconds count down out loud
+            sfx("tick", { n: whole }); buzz(whole <= 2 ? 14 : 6);
+            const tm = $("timer"); tm.classList.remove("beat"); void tm.offsetWidth; tm.classList.add("beat");
+            if (whole === 5) MUSIC.setScene("tense");
+          }
+        }
+        if (rem <= 0) { sfx("timeup"); lock(true); }
       } else if (!G.timed) $("timer").classList.remove("low");
       if (G.mode === "fluor" && G.ready && !G.locked && G.shutter) {
         G.exposure[G.k] += dt; G.signal = Math.exp(-BLEACH[G.k] * G.exposure[G.k]);
@@ -3634,10 +3807,9 @@ function loop(now) {
       if (G.mode === "confocal" && G.ready && !G.locked && now - G.lastNoise > 140) { G.lastNoise = now; G.dirty = true; }
     }
     if (G.mode === "fluor") { $("signalFill").style.transform = `scaleX(${G.signal.toFixed(3)})`; $("signalTxt").textContent = `${Math.round(G.signal * 100)}%`; }
-    // eased visual focus: the view glides to the knob position instead of jumping
-    const diff = G.stageZ - G.zv;
-    if (Math.abs(diff) > 0.003) { G.zv += diff * (prefersReduced() ? 1 : 1 - Math.exp(-dt / 0.05)); G.dirty = true; }
-    else if (diff !== 0) { G.zv = G.stageZ; G.dirty = true; }
+    // the focus drive: pending knob rotation reaches the stage smoothly, frame by frame
+    if (!G.paused) stepFocus(Math.max(0.001, dt)); else knobSound(0, 0);
+    if (G.zv !== G.stageZ) { G.zv = G.stageZ; G.dirty = true; }
     if (G.ready) checkOil();
     TUT.tick();
     if (G.dirty) {
@@ -3670,6 +3842,16 @@ requestAnimationFrame(loop);
 if (location.hash === "#pftest") window.__pf = { get G() { return G; }, get music() { return { playing: MUSIC.playing, enabled: MUSIC.enabled }; }, plates() { return Object.keys(plateImgs); },
   renderSpec(mode, seed, k) { const m = MODES[mode], sp = genSpecimen(seed, mode, mode === "bright" ? ORGS[seed % ORGS.length].id : null), o = m.objs[k], cv = newCanvas(); renderField(cv.getContext("2d"), sp, buildLayers(sp, o, k === 2), { o, e: effective(mode, k, true, 1), d: -sp.targets[k].z, cube: "all", shutter: true, signal: 1 }); return { url: cv.toDataURL("image/jpeg", 0.85), kind: sp.plate || sp.orgId || sp.kind }; },
   start(mode, seed) { startGame({ seed, mode }); },
+  drive, log: [], setLeft(sec) { const o = OBJ[G.k]; G.t0 = performance.now() - (o.time - sec) * 1000; },
+  async knobTest() {
+    // coarse ramps 0 -> 600 deg/s -> 0 over 3 s, then fine ramps 0 -> 300 deg/s -> 0 over 3 s
+    const OC = new OfflineAudioContext(1, 44100 * 6, 44100), S = knobAudio(OC);
+    for (let i = 0; i <= 120; i++) { const t = i * 0.05, u = t < 3 ? Math.sin(Math.PI * t / 3) : 0, v = t >= 3 ? Math.sin(Math.PI * (t - 3) / 3) : 0; knobLevels(S, 600 * u, 300 * v, t, 0.02); }
+    const b = await OC.startRendering(), x = b.getChannelData(0), out = [];
+    for (let k = 0; k < 24; k++) { let e = 0; for (let i = k * 11025; i < (k + 1) * 11025; i++) e += x[i] * x[i]; out.push(+Math.sqrt(e / 11025).toFixed(4)); }
+    let pk = 0; for (const v of x) pk = Math.max(pk, Math.abs(v));
+    return { rms: out, peak: +pk.toFixed(3) };
+  },
   async musicWav(sec) {
     const b = await MUSIC.renderOffline(sec), L = b.getChannelData(0), R = b.getChannelData(1), n = L.length;
     const dv = new DataView(new ArrayBuffer(44 + n * 4)); let o = 0;
