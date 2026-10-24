@@ -3058,10 +3058,14 @@ function genEye(seed, R) {
     const [u, v] = toUV(x, y);
     if ((u / Ea) ** 2 + (v / Eb) ** 2 > 1) return -1e30;
     const zs = cz + Math.sqrt(Re * Re - rr * rr), nz = Math.sqrt(1 - (rr / Re) ** 2);
-    const f = facetAt(u, v), lx = u - f[0], ly = v - f[1], d = Math.hypot(lx, ly) / (a / 2);
-    let h = d < 1 ? hd * Math.pow(1 - d * d, 0.55) : -0.7 * hd * (d - 1);
+    const f = facetAt(u, v), lx = u - f[0], ly = v - f[1];
+    // each lens fills its hexagon: a rounded-hexagon dome meeting its neighbours in a shallow groove
+    const p1 = lx / (a / 2), p2 = (0.5 * lx + 0.866 * ly) / (a / 2), p3 = (-0.5 * lx + 0.866 * ly) / (a / 2);
+    const dh = Math.max(Math.abs(p1), Math.abs(p2), Math.abs(p3));
+    const d = Math.min(1, Math.pow((p1 ** 6 + p2 ** 6 + p3 ** 6) / 1.06, 1 / 6)); // a rounded hexagon, no creases
+    let h = hd * Math.pow(Math.max(0, 1 - d * d), 0.5) - (dh > 0.94 ? 0.5 * (dh - 0.94) / 0.06 : 0);
     // corneal nipples: a hexagonal array of tiny bumps on every lens, each lens with its own grain
-    if (p < 0.06 && d < 0.96) {
+    if (p < 0.1 && d < 0.96) {
       const th = hi(f[2], f[3], 5) * PI / 3, c = Math.cos(th), s = Math.sin(th), X = lx * c + ly * s, Y = -lx * s + ly * c, sp = 0.235;
       const row = Math.round(Y / (sp * SQ3 / 2)), col = Math.round(X / sp - (row & 1) * 0.5);
       const bx = (col + (row & 1) * 0.5 + 0.12 * (hi(col, row, 6) - 0.5)) * sp, by = (row + 0.12 * (hi(col, row, 7) - 0.5)) * sp * SQ3 / 2;
@@ -3083,8 +3087,8 @@ function genEye(seed, R) {
     if ((u / Ea) ** 2 + (v / Eb) ** 2 > 0.92) continue;
     const ang = Math.hypot(u, v) / Re, rr = Re * Math.sin(ang), dir = Math.atan2(v, u), x = Math.cos(dir) * rr, y = Math.sin(dir) * rr;
     const z = cz + Math.sqrt(Re * Re - rr * rr) - 0.4, n = [x / Re, y / Re, (z - cz) / Re];
-    const t = norm3([n[0] + Math.cos(comb) * 1.1, n[1] + Math.sin(comb) * 1.1, n[2] * 0.55]), L = 12 * R.range(0.85, 1.12);
-    prims.push(seg([x, y, z], [x + t[0] * L, y + t[1] * L, z + t[2] * L], 0.48, 0.05, { taper: 1.7, tone: 1.05 }));
+    const t = norm3([n[0] + Math.cos(comb) * 2.2, n[1] + Math.sin(comb) * 2.2, n[2] * 1.5]), L = 15 * R.range(0.85, 1.12);
+    prims.push(seg([x, y, z + 0.6], [x + t[0] * L, y + t[1] * L, z + 0.6 + t[2] * L], 0.5, 0.05, { taper: 1.7, tone: 1.05 }));
     prims.push(ell([x, y, z - 0.1], [0.95, 0.95, 0.45], rotAxes(0, 0, 0), { tone: 0.95 }));
     bristles.push([x, y]);
   }
@@ -6122,7 +6126,7 @@ function semStigPlot(ax, ay, b, kV) {
     <line x1="${c}" y1="5" x2="${c}" y2="${S - 5}" class="vs-ax"/><line x1="5" y1="${c}" x2="${S - 5}" y2="${c}" class="vs-ax"/>
     <circle cx="${c}" cy="${c}" r="${Math.max(3, ok * sc).toFixed(1)}" class="vs-ok"/>
     <circle cx="${clamp(x, 5, S - 5).toFixed(1)}" cy="${clamp(y, 5, S - 5).toFixed(1)}" r="4" class="vc-dot"/>
-  </svg><p><b>Stigmators</b><span>${Math.hypot(ax, ay) < ok ? "Round spot" : "Spot still elliptical"}</span><span>off by X ${(ax / STIG_UM).toFixed(1)} %, Y ${(ay / STIG_UM).toFixed(1)} %</span></p></div>`;
+  </svg><p><b>Stigmators</b><span>${Math.hypot(ax, ay) < ok * 0.25 ? "Round spot" : Math.hypot(ax, ay) < ok ? "Ellipse too small to see here" : "Spot still elliptical"}</span><span>off by X ${(ax / STIG_UM).toFixed(1)} %, Y ${(ay / STIG_UM).toFixed(1)} %</span></p></div>`;
 }
 
 /* ---------- verdict and the next field ---------- */
